@@ -7,16 +7,24 @@
 
 #include <glm/glm.hpp>
 
-class AbstractBody
+class Entity
 {
 public:
     glm::vec3 position;
     glm::vec3 velocity;
     glm::vec3 acceleration;
-    glm::vec3 rotation;
+    union
+    {
+        glm::vec3 rotation;
+        struct
+        {
+            float pitch;
+            float yaw;
+            float roll;
+        };
+    };
     float mass;
     float frictionConstant;
-    float yaw, pitch;
 
     /**
      * Constructor for creating a new entity
@@ -30,52 +38,28 @@ public:
      * @param yaw The yaw of the entity
      * @param pitch The pitch of the entity
      */
-    AbstractBody(glm::vec3 position, glm::vec3 velocity, glm::vec3 acceleration, glm::vec3 rotation, float mass,
-                 float frictionConstant, float yaw, float pitch);
+    Entity(glm::vec3 position, glm::vec3 velocity, glm::vec3 acceleration, glm::vec3 rotation, float mass,
+           float frictionConstant, float yaw, float pitch);
 
     /**
      * Default constructor for creating a new entity
      */
-    AbstractBody();
+    Entity();
 
     /**
      * Update the entity
      *
      * @param deltaTime The time since the last update
      */
-    void update(float deltaTime);
+    virtual void update(float deltaTime);
 
     /**
      * Apply a force to the entity
      *
-     * @param force The force to apply
+     * @param force The force to apply, given in Newtons
      */
-    void applyForce(glm::vec3 force);
+    void applyForce(glm::vec3 force, float deltaTime);
 
 };
-
-class Player : public AbstractBody
-{
-public:
-
-    Player(glm::vec3 position, glm::vec3 velocity, glm::vec3 acceleration, glm::vec3 rotation, float mass,
-           float frictionConstant, float yaw, float pitch) : AbstractBody(position, velocity, acceleration, rotation,
-                                                                          mass, frictionConstant, yaw, pitch)
-    {}
-
-    Player() : AbstractBody() {}
-
-    /**
-     * Move the player by the given amount.
-     * This will update the acceleration, velocity and position
-     * accordingly.
-     *
-     * @param x
-     * @param y
-     * @param z
-     */
-    void move(float x, float y, float z);
-};
-
 
 #endif //GRAPHICS_TEST_ENTITY_H

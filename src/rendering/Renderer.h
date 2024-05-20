@@ -2,8 +2,8 @@
 // Created by Luca Warmenhoven on 17/05/2024.
 //
 
-#ifndef GRAPHICS_TEST_RENDERING_H
-#define GRAPHICS_TEST_RENDERING_H
+#ifndef GRAPHICS_TEST_RENDERER_H
+#define GRAPHICS_TEST_RENDERER_H
 
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
@@ -11,12 +11,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <OpenGL/gl3.h>
 #include "GLFW/glfw3.h"
+#include "Drawable.h"
 #include <vector>
 
 #define RENDER_MODE_2D 0
 #define RENDER_MODE_3D 1
 
-class Rendering
+class Renderer
 {
 private:
     /** The position and rotation of the object. */
@@ -32,7 +33,7 @@ private:
 
 public:
 
-    Rendering();
+    Renderer();
 
     /**
      * Function that prepares all the matrices and
@@ -141,7 +142,13 @@ public:
      */
     void setRenderMode(unsigned char renderMode);
 
+    /**
+     * Function that resets the matrices.
+     */
+    void resetMatrices();
+
     static const glm::mat4 IDENTITY;
+
 };
 
 typedef enum {
@@ -162,6 +169,7 @@ private:
 public:
     Shader();
     Shader(std::string sourcePath, std::string sourceName);
+    ~Shader();
 
     /**
      * Load the shader from a source file.
@@ -250,6 +258,11 @@ public:
     explicit VBO();
 
     /**
+     * Destructor for the VBO.
+     */
+    ~VBO();
+
+    /**
      * Method for supplying vector data to the VBO.
      * This method will pass the data onto the appropriate buffer,
      * depending on the provided
@@ -267,7 +280,7 @@ public:
      * @param segmentSize The size of each segment in the data.
      * @param vectorDataType The kind of data that is being supplied.
      */
-    void withIndices(std::vector<int> indices);
+    void withIndices(std::vector<unsigned int> indices);
 
     /**
      * Build the VBO.
@@ -282,4 +295,4 @@ public:
 };
 
 
-#endif //GRAPHICS_TEST_RENDERING_H
+#endif //GRAPHICS_TEST_RENDERER_H

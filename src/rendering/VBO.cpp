@@ -2,11 +2,17 @@
 // Created by Luca Warmenhoven on 15/05/2024.
 //
 
-#include "Rendering.h"
+#include "Renderer.h"
 
 VBO::VBO() {
     glGenBuffers(1, &this->vboBufferId);
     glGenBuffers(1, &this->eboBufferId);
+}
+
+VBO::~VBO() {
+    glDeleteBuffers(1, &this->vboBufferId);
+    glDeleteBuffers(1, &this->eboBufferId);
+    glDeleteVertexArrays(1, &this->vaoId);
 }
 
 /** Supply the VBO with vertices */
@@ -22,7 +28,7 @@ void VBO::withVertices(std::vector<Vertex> vertices) {
 }
 
 /** Supply the VBO with indices */
-void VBO::withIndices(std::vector<int> indices) {
+void VBO::withIndices(std::vector<unsigned int> indices) {
     this->size = indices.size();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eboBufferId);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), (void*)indices.data(), GL_STATIC_DRAW);
@@ -49,17 +55,15 @@ void VBO::build() {
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eboBufferId);
 
+    glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 }
 
 void VBO::render() const
 {
     glBindVertexArray(this->vaoId);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eboBufferId);
-    glDrawArrays(GL_TRIANGLES, 0, this->size);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glDrawElements(GL_TRIANGLES, this->size, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 

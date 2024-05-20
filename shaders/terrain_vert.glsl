@@ -2,14 +2,13 @@
 
 layout(location = 0) in vec3 position;
 
-out vec4 fragPos;
-out vec3 o_pos;
-
+out vec4 screenPos;
+out vec3 vertexPosition;
 uniform mat4 u_ModelViewProjectionMatrix;
 
 void main()
 {
-    o_pos = position;
+    vertexPosition = position;
     gl_Position = u_ModelViewProjectionMatrix * vec4(position, 1.0);
-    fragPos = gl_Position;
+    screenPos = gl_Position;
 }

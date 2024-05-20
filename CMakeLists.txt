@@ -13,6 +13,6 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 link_directories(${PROJECT_SOURCE_DIR}/libraries)
 
-add_executable(graphics_test src/main.cpp src/rendering/VBO.cpp src/rendering/Shader.cpp src/io/Files.cpp src/io/Files.h src/rendering/Renderer.cpp src/rendering/Rendering.h src/world/entity/AbstractBody.cpp src/world/entity/Entity.h src/world/entity/Player.cpp src/world/SimplexNoise.cpp src/world/SimplexNoise.h src/world/WorldObject.cpp src/world/WorldObject.h src/rendering/Drawable.h)
+add_executable(graphics_test src/main.cpp src/rendering/VBO.cpp src/rendering/Shader.cpp src/io/Files.cpp src/io/Files.h src/rendering/Renderer.cpp src/rendering/Renderer.h src/world/entity/Entity.cpp src/world/entity/Entity.h src/world/entity/Player.cpp src/world/SimplexNoise.cpp src/world/SimplexNoise.h src/world/WorldObject.cpp src/world/WorldObject.h src/rendering/Drawable.h src/rendering/font/DrawableFont.h src/rendering/font/TrueType.cpp src/world/entity/Player.h src/world/chunk/Chunk.cpp src/world/World.h src/world/World.cpp)
 
 target_link_libraries(graphics_test ${PROJECT_SOURCE_DIR}/libraries/libglfw3.a)

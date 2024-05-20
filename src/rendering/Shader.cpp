@@ -3,7 +3,7 @@
 //
 
 #include <fstream>
-#include "Rendering.h"
+#include "Renderer.h"
 #include "../io/Files.h"
 #include <iostream>
 
@@ -63,4 +63,10 @@ GLuint Shader::getProgramId() const {
 }
 
 Shader::Shader() {}
+
+Shader::~Shader() {
+    glDeleteProgram(this->programId);
+    glDeleteShader(this->vertexShaderId);
+    glDeleteShader(this->fragmentShaderId);
+}
 

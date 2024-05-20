@@ -7,7 +7,7 @@
 
 
 #include "../rendering/Drawable.h"
-#include "../rendering/Rendering.h"
+#include "../rendering/Renderer.h"
 
 #include <glm/glm.hpp>
 
@@ -20,6 +20,7 @@ public:
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
+    std::vector<VBO> meshes;
 
     /**
      * Constructor for creating a new world object
@@ -29,11 +30,6 @@ public:
      * @param scale The scale of the world object
      */
     WorldObject(std::vector<VBO> meshes, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
-
-    /**
-     * Default constructor for creating a new world object
-     */
-    WorldObject();
 
     /**
      * Render the world object

@@ -1,14 +1,24 @@
 #include <iostream>
-#include "rendering/Rendering.h"
+#include "rendering/Renderer.h"
 #include "io/Files.h"
-#include "world/entity/Entity.h"
+#include "world/entity/Player.h"
+#include "world/SimplexNoise.h"
+#include "world/World.h"
 
 using namespace std::chrono;
 
+#define VSYNC_ENABLED 0
+
 GLint width, height;
 GLFWwindow *window;
-Rendering renderer;
+
+World world;
+Renderer renderer;
+
 Player player = Player();
+
+const std::string shaderDirectory = "/Users/lucawarm/Jetbrains/CLion/graphics-test/shaders/";
+const glm::vec2 scrollFactor = glm::vec2(1.f, 1.f);
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
@@ -18,6 +28,8 @@ int main()
         std::cout << "Failed to initialize GLFW" << std::endl;
         exit(1);
     }
+
+    player.frictionConstant = 5.0f;
 
     glfwSetErrorCallback([](int error, const char* description) {
         std::cout << "GLFW Error " << error << " - " << description << std::endl;
@@ -30,7 +42,14 @@ int main()
     window = glfwCreateWindow(1200, 700, "Window Test", NULL, NULL);
 
     glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
+        ::width = width;
+        ::height = height;
+    });
 
+    glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
+        player.pitch = fmod(player.pitch - yoffset * scrollFactor.x, 360.0f);
+        player.yaw = fmod(player.yaw + xoffset * scrollFactor.y, 360.0f);
+        player.pitch = glm::clamp(player.pitch, -90.0f, 90.0f);
     });
 
     glfwSetKeyCallback(window, keyCallback);
@@ -43,29 +62,21 @@ int main()
     glfwMakeContextCurrent(window);
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
+    glfwSwapInterval(VSYNC_ENABLED);
 
-    std::vector<Vertex> vertices = {
-            {-10.0, 0.0, 0.0},
-            {10, 0.0, 0.0},
-            {10, 10, 0.0},
-            {-10, 10, 0.0},
-    };
-    std::vector<int> indices = {
-            0, 1, 2,
-            2, 3, 0
-    };
-    VBO vbo;
-    vbo.withVertices(vertices);
-    vbo.withIndices(indices);
-    vbo.build();
-    Shader shader = Shader("/Users/lucawarm/Jetbrains/CLion/graphics-test/shaders", "3d");
+    Shader shader = Shader(shaderDirectory, "3d");
     shader.bind();
 
     renderer.setRenderMode(RENDER_MODE_3D);
 
+    world.generate();
+
 
     duration lastTime = system_clock::now().time_since_epoch();
+    duration currentTime = system_clock::now().time_since_epoch();
     float deltaTime = 1.0;
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     while (!glfwWindowShouldClose(window)) {
         glViewport(0, 0, width, height);
@@ -73,20 +84,21 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         renderer.translate(glm::vec4(player.position, 1.0f));
-        renderer.rotate(glm::vec4(player.rotation, 1.0f));
-
-        player.update(deltaTime);
+        renderer.rotate(glm::vec4(glm::radians(player.pitch), glm::radians(player.yaw), 0.0, 0.0));
 
         renderer.computeMatrices(70.0f,0.1f,1000.0f,(float) width,(float) height);
         renderer.pushMatrices(shader.getProgramId());
-        vbo.render();
+
+        world.render(deltaTime);
+        player.update(deltaTime);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
-        deltaTime = (
-                duration_cast<nanoseconds>(
-                        system_clock::now().time_since_epoch()
-                        ).count() - duration_cast<nanoseconds>(lastTime).count()
-                ) / 1000000000.0;
+
+        // Update delta time
+        lastTime = currentTime;
+        currentTime = system_clock::now().time_since_epoch();
+        deltaTime = (float)duration_cast<microseconds>(currentTime - lastTime).count() / 1000000.0f;
     }
     glfwDestroyWindow(window);
     glfwTerminate();
@@ -96,17 +108,5 @@ int main()
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
-    }
-
-    if ( action == GLFW_PRESS || action == GLFW_REPEAT ) {
-        if ( key == GLFW_KEY_W ) {
-            player.applyForce(glm::vec3(0.0f, 0.0f, -1.0f));
-        } else if ( key == GLFW_KEY_S ) {
-            player.applyForce(glm::vec3(0.0f, 0.0f, 1.0f));
-        } else if ( key == GLFW_KEY_A ) {
-            player.applyForce(glm::vec3(-1.0f, 0.0f, 0.0f));
-        } else if ( key == GLFW_KEY_D ) {
-            player.applyForce(glm::vec3(1.0f, 0.0f, 0.0f));
-        }
     }
 }
