@@ -2,9 +2,9 @@
 // Created by Luca Warmenhoven on 15/05/2024.
 //
 
-#include "Renderer.h"
+#include "VBO.h"
 
-VBO::VBO() {
+VBO::VBO() : Drawable(glm::vec3(0), glm::vec3(1), glm::vec3(0)){
     glGenBuffers(1, &this->vboBufferId);
     glGenBuffers(1, &this->eboBufferId);
 }
@@ -15,25 +15,39 @@ VBO::~VBO() {
     glDeleteVertexArrays(1, &this->vaoId);
 }
 
+void VBO::withVertices(Vertex *vertices, unsigned long vertexCount)
+{
+    if ( vertexCount == 0 )
+        throw std::invalid_argument("Invalid data supplied to VBO");
+    glBindBuffer(GL_ARRAY_BUFFER, this->vboBufferId);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 /** Supply the VBO with vertices */
 void VBO::withVertices(std::vector<Vertex> vertices) {
-
-    // Check if the data is valid
     if ( vertices.empty() )
         throw std::invalid_argument("Invalid data supplied to VBO");
-
     glBindBuffer(GL_ARRAY_BUFFER, this->vboBufferId);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), (void*)vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void VBO::withIndices(unsigned int *indices, unsigned long indicesCount)
+{
+    if ( indicesCount == 0 )
+        throw std::invalid_argument("Invalid data supplied to VBO");
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eboBufferId);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesCount * sizeof(int), indices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    this->size = indicesCount;
 }
 
 /** Supply the VBO with indices */
 void VBO::withIndices(std::vector<unsigned int> indices) {
-    this->size = indices.size();
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eboBufferId);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), (void*)indices.data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    this->withIndices(indices.data(), indices.size());
 }
+
 
 /**
  * Build the VBO using VAOs
@@ -60,7 +74,7 @@ void VBO::build() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void VBO::render() const
+void VBO::draw(float deltaTime)
 {
     glBindVertexArray(this->vaoId);
     glDrawElements(GL_TRIANGLES, this->size, GL_UNSIGNED_INT, 0);

@@ -6,8 +6,8 @@
 #define GRAPHICS_TEST_WORLDOBJECT_H
 
 
-#include "../rendering/Drawable.h"
-#include "../rendering/Renderer.h"
+#include "../rendering/Rendering.h"
+#include "../rendering/VBO.h"
 
 #include <glm/glm.hpp>
 
@@ -17,9 +17,6 @@
 class WorldObject : public Drawable
 {
 public:
-    glm::vec3 position;
-    glm::vec3 rotation;
-    glm::vec3 scale;
     std::vector<VBO> meshes;
 
     /**
@@ -31,10 +28,12 @@ public:
      */
     WorldObject(std::vector<VBO> meshes, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
 
+    WorldObject(VBO mesh, glm::vec3 position);
+
     /**
      * Render the world object
      */
-    void render() override;
+    void draw(float deltaTime) override;
 };
 
 

@@ -6,23 +6,14 @@
 #define GRAPHICS_TEST_ENTITY_H
 
 #include <glm/glm.hpp>
+#include "../../rendering/Rendering.h"
+#include "../WorldObject.h"
 
-class Entity
+class Entity : public Updatable, public Drawable
 {
 public:
-    glm::vec3 position;
     glm::vec3 velocity;
     glm::vec3 acceleration;
-    union
-    {
-        glm::vec3 rotation;
-        struct
-        {
-            float pitch;
-            float yaw;
-            float roll;
-        };
-    };
     float mass;
     float frictionConstant;
 
@@ -35,11 +26,9 @@ public:
      * @param rotation The rotation of the entity
      * @param mass The mass of the entity
      * @param frictionConstant The friction constant of the entity
-     * @param yaw The yaw of the entity
-     * @param pitch The pitch of the entity
      */
     Entity(glm::vec3 position, glm::vec3 velocity, glm::vec3 acceleration, glm::vec3 rotation, float mass,
-           float frictionConstant, float yaw, float pitch);
+              float frictionConstant);
 
     /**
      * Default constructor for creating a new entity
@@ -51,7 +40,7 @@ public:
      *
      * @param deltaTime The time since the last update
      */
-    virtual void update(float deltaTime);
+    void update(float deltaTime) override;
 
     /**
      * Apply a force to the entity
@@ -59,6 +48,11 @@ public:
      * @param force The force to apply, given in Newtons
      */
     void applyForce(glm::vec3 force, float deltaTime);
+
+    /**
+     * Method for rendering this entity in the world.
+     */
+    void draw(float deltaTime) override;
 
 };
 

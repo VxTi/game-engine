@@ -3,7 +3,7 @@
 //
 
 #include <fstream>
-#include "Renderer.h"
+#include "Shader.h"
 #include "../io/Files.h"
 #include <iostream>
 
@@ -60,6 +60,26 @@ Shader::Shader(std::string sourcePath, std::string sourceName)
 
 GLuint Shader::getProgramId() const {
     return this->programId;
+}
+
+void Shader::uniformFloat(const char *name, float value) {
+    glUniform1f(glGetUniformLocation(this->programId, name), value);
+}
+
+void Shader::uniformNFloat(const char *name, int count, float *value) {
+    glUniform1fv(glGetUniformLocation(this->programId, name), count, value);
+}
+
+void Shader::uniformVec3(const char *name, float x, float y, float z) {
+    glUniform3f(glGetUniformLocation(this->programId, name), x, y, z);
+}
+
+void Shader::uniformVec4(const char *name, float x, float y, float z, float w) {
+    glUniform4f(glGetUniformLocation(this->programId, name), x, y, z, w);
+}
+
+void Shader::uniformMat4(const char *name, float *value) {
+    glUniformMatrix4fv(glGetUniformLocation(this->programId, name), 1, GL_FALSE, value);
 }
 
 Shader::Shader() {}

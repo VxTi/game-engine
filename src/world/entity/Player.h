@@ -15,15 +15,15 @@ class Player : public Entity
 public:
 
     Player(glm::vec3 position, glm::vec3 velocity, glm::vec3 acceleration, glm::vec3 rotation, float mass,
-           float frictionConstant, float yaw, float pitch) : Entity(position, velocity, acceleration, rotation,
-                                                                    mass, frictionConstant, yaw, pitch)
+           float frictionConstant) : Entity(position, velocity, acceleration, rotation,
+                                               mass, frictionConstant)
     {}
 
     Player() : Entity() {}
 
     void update(float deltaTime);
 
-    const float movementSpeedForce = 400.0f;
+    const float movementSpeedForce = 1000.0f;
 
     /**
      * Move the player by the given amount.
