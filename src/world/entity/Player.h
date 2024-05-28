@@ -16,10 +16,11 @@ public:
 
     Player(glm::vec3 position, glm::vec3 velocity, glm::vec3 acceleration, glm::vec3 rotation, float mass,
            float frictionConstant) : Entity(position, velocity, acceleration, rotation,
-                                               mass, frictionConstant)
+                                            mass, frictionConstant)
     {}
 
-    Player() : Entity() {}
+    Player() : Entity()
+    {}
 
     void update(float deltaTime);
 

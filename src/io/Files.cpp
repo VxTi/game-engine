@@ -7,16 +7,17 @@
 #include <iostream>
 #include <fstream>
 
-std::string Files::readFile(const char * path) {
+std::string Files::readFile(const char *path)
+{
     std::ifstream file;
     file.open(path);
-    if (!file) {
+    if ( !file ) {
         std::cout << "Failed to open file: " << path << std::endl;
         return "";
     }
     std::string source;
     std::string line;
-    while (std::getline(file, line)) {
+    while ( std::getline(file, line)) {
         source += line + "\n";
     }
     file.close();

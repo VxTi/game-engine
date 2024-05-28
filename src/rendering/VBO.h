@@ -25,7 +25,10 @@ private:
     GLuint eboBufferId;
 
     /** The size of the VBO */
-    unsigned long size;
+    GLsizei size;
+
+    /** Rendering mode of this VBO */
+    unsigned int renderingMode = GL_TRIANGLES;
 
 public:
 
@@ -36,6 +39,11 @@ public:
      * will hold, such as vertex positions and colors.
      */
     explicit VBO();
+
+    /**
+     * Constructor for creating a VBO with a specific rendering mode
+     */
+    VBO(unsigned int renderingMode);
 
     /**
      * Destructor for the VBO.
@@ -62,7 +70,7 @@ public:
      * @param segmentSize The vertexCount of each segment in the data.
      * @param vectorDataType The kind of data that is being supplied.
      */
-    void withVertices(Vertex* vertices, unsigned long vertexCount);
+    void withVertices(Vertex *vertices, unsigned long vertexCount);
 
     /**
      * Method for supplying index data to the VBO.
@@ -83,7 +91,7 @@ public:
      * @param segmentSize The indicesCount of each segment in the data.
      * @param vectorDataType The kind of data that is being supplied.
      */
-    void withIndices(unsigned int* indices, unsigned long indicesCount);
+    void withIndices(unsigned int *indices, unsigned long indicesCount);
 
     /**
      * Build the VBO.

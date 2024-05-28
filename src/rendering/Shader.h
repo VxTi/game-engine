@@ -53,14 +53,34 @@ public:
      */
     void unbind();
 
+    /**
+     * Uploads a floating point value to the shader
+     */
     void uniformFloat(const char *name, float value);
 
+    /**
+     * Uploads an array of floating point numbers to the shader
+     */
     void uniformNFloat(const char *name, int count, float *value);
 
+    /**
+     * Uploads a vec2 (2 floating point values) to the shader
+     */
+    void uniformVec2(const char *name, float x, float y);
+
+    /**
+     * Uploads a vec3 (3 floating point values) to the shader
+     */
     void uniformVec3(const char *name, float x, float y, float z);
 
+    /**
+     * Uploads a vec4 (4 floating point values) to the shader
+     */
     void uniformVec4(const char *name, float x, float y, float z, float w);
 
+    /**
+     * Uploads a mat4 (4x4 matrix) to the shader
+     */
     void uniformMat4(const char *name, float *value);
 
     /**

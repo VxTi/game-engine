@@ -22,40 +22,6 @@ using namespace glm;
 #define VBO_NORMAL_INDEX 1
 #define VBO_UV_INDEX 2
 
-class Transformation {
-public:
-    vec3 position;
-    vec3 scale;
-    union {
-        vec3 rotation;
-        struct
-        {
-            float pitch;
-            float yaw;
-            float roll;
-        };
-    };
-};
-
-/**
- * Class representing a drawable object.
- * The draw method must be overridden when extending this class.
- */
-class Drawable : public Transformation
-{
-public:
-    Drawable(vec3 position, vec3 scale, vec3 rotation);
-    virtual void draw(float deltaTime) = 0;
-};
-
-/**
- * Class representing an updatable object.
- */
-class Updatable
-{
-public:
-    virtual void update(float deltaTime) = 0;
-};
 
 /**
  * Struct representing a frustum edge plane.
@@ -82,6 +48,52 @@ typedef struct
     float aspect;
     float fov;
 } Frustum;
+
+class Transformation
+{
+public:
+    vec3 position;
+    vec3 scale;
+    union
+    {
+        vec3 rotation;
+        struct
+        {
+            float pitch;
+            float yaw;
+            float roll;
+        };
+    };
+};
+
+/**
+ * Class representing a drawable object.
+ * The draw method must be overridden when extending this class.
+ */
+class Drawable : public Transformation
+{
+public:
+    Drawable(vec3 position, vec3 scale, vec3 rotation);
+
+    virtual void draw(float deltaTime) = 0;
+
+    /**
+     * Function that checks whether the object is within the provided frustum.
+     * @param frustum The frustum to check against
+     * @return Whether the object is within the frustum
+     */
+    /*virtual bool isWithinFrustum(Frustum frustum);*/
+};
+
+/**
+ * Class representing an updatable object.
+ */
+class Updatable
+{
+public:
+    virtual void update(float deltaTime) = 0;
+};
+
 
 /**
  * Function for creating a new frustum.

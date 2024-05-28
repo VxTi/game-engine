@@ -12,21 +12,20 @@ void split(char *input, char **output, size_t *segment_count, const char *delimi
     char *result = strtok(input, delimiter);
     std::vector<char *> results = std::vector<char *>();
     // If no results were found, return.
-    if (!result)
-    {
+    if ( !result ) {
         *output = {};
         *segment_count = 0;
         return;
     }
     results.emplace_back(result);
-    while ((result = strtok(nullptr, delimiter))) {
+    while (( result = strtok(nullptr, delimiter))) {
         results.emplace_back(result);
     }
     *segment_count = results.size();
     *output = *results.data();
 }
 
-Model* Model::loadObj(const char *filePath)
+Model *Model::loadObj(const char *filePath)
 {
     std::ifstream file;
     file.open(filePath);
@@ -59,7 +58,7 @@ Model* Model::loadObj(const char *filePath)
                     atof(strtok(nullptr, segment_separator)),
                     atof(strtok(nullptr, segment_separator)),
                     atof(strtok(nullptr, segment_separator))
-                    ));
+            ));
 
             // Handle indices
         } else if ( !strcmp(segment, "f")) {

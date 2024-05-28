@@ -33,10 +33,10 @@ void Chunk::generate()
         x0 = ( i % size );
         z0 = ( i / size );
 
-        px = this->position.x + (float)x0;
-        pz = this->position.z + (float)z0;
+        px = (this->position.x + (float) x0);
+        pz = (this->position.z + (float) z0);
 
-        py = World::getTerrainHeight(px, pz);
+        py = World::getTerrainHeight(px / 10, pz / 10);
 
         py_nx = World::getTerrainHeight(px + 1, pz);
         py_nz = World::getTerrainHeight(px, pz + 1);
@@ -49,19 +49,19 @@ void Chunk::generate()
         vec3 v1 = vec3(px, py, pz) - vec3(px, py_nz, pz + 1);
         vec3 normal = normalize(cross(u1, v1));
         worldVertices.push_back({
-                        .x = ((float) px*4 ),
-                        .y = py,
-                        .z =((float) pz*4 ),
-                        .nx = normal.x,
-                        .ny = normal.y,
-                        .nz = normal.z,
-        });
+                                        .x = px,
+                                        .y = py,
+                                        .z = pz,
+                                        .nx = normal.x,
+                                        .ny = normal.y,
+                                        .nz = normal.z,
+                                });
         if ( x0 == size - 1 || z0 == size - 1 ) {
             continue;
         }
         worldIndices.push_back(i);
-        worldIndices.push_back(i + 1);
         worldIndices.push_back(i + size);
+        worldIndices.push_back(i + 1);
 
         worldIndices.push_back(i + 1);
         worldIndices.push_back(i + size);
@@ -75,5 +75,5 @@ void Chunk::generate()
 
 void Chunk::draw(float deltaTime)
 {
-    this->meshVbo->draw(0);
+    this->meshVbo->draw(deltaTime);
 }

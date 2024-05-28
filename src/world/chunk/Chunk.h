@@ -10,20 +10,19 @@
 #include "../../rendering/Rendering.h"
 #include "../../rendering/VBO.h"
 
-#define CHUNK_SIZE 32
-#define CHUNK_GENERATION_MAX_HEIGHT 8
-#define CHUNK_GENERATION_OCTAVE_COUNT 4
-
-#define CHUNK_GENERATION_RANDOM_BIAS_FACTOR (0.1f)
-
 class Chunk : public Drawable
 {
+private:
+
 
 public:
     VBO *meshVbo;
-    union {
+
+    union
+    {
         glm::vec3 position;
-        struct {
+        struct
+        {
             float x;
             float y;
             float z;
@@ -38,10 +37,10 @@ public:
      * CHUNK_GENERATION_OCTAVES[1] - The height multiplier
      */
     static constexpr float CHUNK_GENERATION_OCTAVES[][2] = {
-            {200, 30 },
-            {4, 1},
-            {4, .1},
-            { 1, .005}
+            { 200, 30 },
+            { 4,   1 },
+            { 4,   .1 },
+            { 1,   .005 }
     };
 
     /**

@@ -62,82 +62,98 @@ void Renderer::pushMatrices(GLuint shaderProgramId)
 
 void Renderer::translate(vec3 pos)
 {
-    Transformation::position = pos;
+    Transformation::position = glm::vec4(pos, 1.0f);
+    this->modelMatrix = glm::translate(this->modelMatrix, pos);
 }
 
 void Renderer::translate(float x, float y, float z)
 {
-    Transformation::position = glm::vec4(x, y, z, 1.0f);
+    Renderer::translate(glm::vec3(x, y, z));
 }
 
 void Renderer::translateX(float x)
 {
     Transformation::position.x = x;
+    this->modelMatrix = glm::translate(this->modelMatrix, glm::vec3(x, Transformation::position.y, Transformation::position.z));
 }
 
 void Renderer::translateY(float y)
 {
     Transformation::position.y = y;
+    this->modelMatrix = glm::translate(this->modelMatrix, glm::vec3(Transformation::position.x, y, Transformation::position.z));
 }
 
 void Renderer::translateZ(float z)
 {
     Transformation::position.z = z;
+    this->modelMatrix = glm::translate(this->modelMatrix, glm::vec3(Transformation::position.x, Transformation::position.y, z));
 }
 
 void Renderer::rotate(glm::vec4 rotation)
 {
     Transformation::rotation = rotation;
+    this->modelMatrix = glm::rotate(this->modelMatrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    this->modelMatrix = glm::rotate(this->modelMatrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    this->modelMatrix = glm::rotate(this->modelMatrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
 void Renderer::rotate(float x, float y, float z)
 {
-    Transformation::rotation = glm::vec4(x, y, z, 1.0f);
+    Renderer::rotate(glm::vec4(x, y, z, 0.0f));
 }
 
 void Renderer::rotateX(float radians)
 {
     Transformation::rotation.x = radians;
+    this->modelMatrix = glm::rotate(this->modelMatrix, radians, glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
 void Renderer::rotateY(float radians)
 {
     Transformation::rotation.y = radians;
+    this->modelMatrix = glm::rotate(this->modelMatrix, radians, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Renderer::rotateZ(float radians)
 {
     Transformation::rotation.z = radians;
+    this->modelMatrix = glm::rotate(this->modelMatrix, radians, glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
 void Renderer::scale(glm::vec3 scalingFactor)
 {
     Transformation::scale = scalingFactor;
+    Renderer::scale(scalingFactor.x, scalingFactor.y, scalingFactor.z);
 }
 
 void Renderer::scale(float scalingFactor)
 {
     Transformation::scale = glm::vec3(scalingFactor);
+    Renderer::scale(scalingFactor, scalingFactor, scalingFactor);
 }
 
 void Renderer::scale(float x, float y, float z)
 {
     Transformation::scale = glm::vec3(x, y, z);
+    this->modelMatrix = glm::scale(this->modelMatrix, glm::vec3(x, y, z));
 }
 
 void Renderer::scaleX(float x)
 {
     Transformation::scale.x = x;
+    this->modelMatrix = glm::scale(this->modelMatrix, glm::vec3(x, Transformation::scale.y, Transformation::scale.z));
 }
 
 void Renderer::scaleY(float y)
 {
     Transformation::scale.y = y;
+    this->modelMatrix = glm::scale(this->modelMatrix, glm::vec3(Transformation::scale.x, y, Transformation::scale.z));
 }
 
 void Renderer::scaleZ(float z)
 {
     Transformation::scale.z = z;
+    this->modelMatrix = glm::scale(this->modelMatrix, glm::vec3(Transformation::scale.x, Transformation::scale.y, z));
 }
 
 void Renderer::setModelMatrix(glm::mat4 model)
@@ -177,7 +193,8 @@ void Renderer::resetMatrices()
     Transformation::scale = glm::vec3(1.0f);
 }
 
-Renderer::Renderer() : Transformation() {}
+Renderer::Renderer() : Transformation()
+{}
 
 /*** Drawable implementation **/
 Drawable::Drawable(glm::vec3 position, glm::vec3 scale, glm::vec3 rotation)

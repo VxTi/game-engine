@@ -28,7 +28,7 @@ public:
      * @param frictionConstant The friction constant of the entity
      */
     Entity(glm::vec3 position, glm::vec3 velocity, glm::vec3 acceleration, glm::vec3 rotation, float mass,
-              float frictionConstant);
+           float frictionConstant);
 
     /**
      * Default constructor for creating a new entity

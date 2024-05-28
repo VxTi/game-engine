@@ -22,6 +22,8 @@ add_executable(graphics_test src/main.cpp src/rendering/VBO.cpp src/rendering/Sh
         src/rendering/Texture.cpp
         src/rendering/Texture.h
         include/stb/stb_image.h
-        src/rendering/Shader.h)
+        src/rendering/Shader.h
+        src/rendering/model/Mesh.cpp
+        src/rendering/model/Mesh.h)
 
 target_link_libraries(graphics_test ${PROJECT_SOURCE_DIR}/libraries/libglfw3.a)

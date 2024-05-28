@@ -16,7 +16,8 @@
 #define GLYPH_FLAG_OVERLAP_SIMPLE 0x40
 #define GLYPH_FLAG_RESERVED 0x80
 
-typedef struct {
+typedef struct
+{
     uint32_t tag;
     uint32_t checkSum;
     uint32_t offset;
@@ -24,7 +25,8 @@ typedef struct {
 } ttf_table_header_t;
 
 
-typedef struct {
+typedef struct
+{
     int16_t numberOfCountours;
     uint16_t *endPtsOfContours;
 
@@ -41,7 +43,8 @@ typedef struct {
 
 } ttf_glyph_t;
 
-typedef struct {
+typedef struct
+{
     uint32_t *glyph_table;
     ttf_glyph_t *glyphs;
 
@@ -53,7 +56,6 @@ typedef struct {
     ttf_table_header_t *maxp;
     ttf_table_header_t *name;
 } ttf;
-
 
 
 class DrawableFont
@@ -80,7 +82,8 @@ private:
     uint16_t entrySelector;
     uint16_t rangeShift;
 
-    TrueTypeFont(uint32_t scalerType, uint16_t numTables, uint16_t searchRange, uint16_t entrySelector, uint16_t rangeShift, ttf_table_header_t *tables);
+    TrueTypeFont(uint32_t scalerType, uint16_t numTables, uint16_t searchRange, uint16_t entrySelector,
+                 uint16_t rangeShift, ttf_table_header_t *tables);
 
 public:
 
@@ -90,7 +93,6 @@ public:
     void draw() override;
 
 };
-
 
 
 #endif //GRAPHICS_TEST_DRAWABLEFONT_H

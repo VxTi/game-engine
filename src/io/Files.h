@@ -11,9 +11,10 @@
 /**
  * A struct that represents a file
  */
-typedef struct {
-    const char * path;
-    const char * content;
+typedef struct
+{
+    const char *path;
+    const char *content;
     const size_t size;
 } File;
 
@@ -26,7 +27,7 @@ public:
      * @param path The path to the file
      * @return A File struct
      */
-    static std::string readFile(const char * path);
+    static std::string readFile(const char *path);
 
 };
 

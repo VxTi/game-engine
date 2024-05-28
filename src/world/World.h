@@ -10,14 +10,20 @@
 #include "entity/Entity.h"
 #include "entity/Player.h"
 
-class World {
+#define CHUNK_SIZE (32)
+#define CHUNK_GENERATION_MAX_HEIGHT (8)
+#define CHUNK_GENERATION_RANDOM_BIAS_FACTOR (0.1f)
+#define CHUNK_BASE_WATER_LEVEL (10.0f)
+
+class World
+{
 
 private:
     std::thread *world_generation_thread;
 
 public:
-    std::vector<Updatable*> updatableObjects;
-    std::vector<Drawable*> drawables;
+    std::vector<Updatable *> updatableObjects;
+    std::vector<Drawable *> drawables;
 
     /**
      * Destructor

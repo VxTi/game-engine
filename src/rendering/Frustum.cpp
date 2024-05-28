@@ -11,9 +11,9 @@ Frustum createFrustum(float zNear, float zFar, float fov, float aspect)
     float halfFov = fov / 2.0f;
     float tanFov = tan(halfFov);
 
-    float halfFarHeight = 2.0f * ( zFar * tanFov);
+    float halfFarHeight = 2.0f * ( zFar * tanFov );
     float halfFarWidth = aspect * halfFarHeight;
-    float halfNearHeight = 2.0f * ( zNear * tanFov);
+    float halfNearHeight = 2.0f * ( zNear * tanFov );
     float halfNearWidth = aspect * halfNearHeight;
 
     // Create the frustum planes
@@ -25,7 +25,7 @@ Frustum createFrustum(float zNear, float zFar, float fov, float aspect)
     Plane top = { normalize(vec3(0, -cosHalfFov, sinHalfFov)) };
     Plane bottom = { normalize(vec3(0, cosHalfFov, sinHalfFov)) };
     Plane left = { normalize(vec3(cosHalfFov, 0, sinHalfFov)) };
-    Plane right = { normalize(vec3(-cosHalfFov, 0, sinHalfFov))};
+    Plane right = { normalize(vec3(-cosHalfFov, 0, sinHalfFov)) };
 
 
     return (Frustum) {
@@ -44,19 +44,18 @@ Frustum createFrustum(float zNear, float zFar, float fov, float aspect)
 
 bool isWithinFrustum(Transformation *transformation, Frustum frustum, glm::vec3 referencePosition)
 {
-    // Translate the reference point to the camera's position
-    /*glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0), glm::vec3(referencePosition));
-    modelMatrix = glm::rotate(modelMatrix, -referenceCamera->rotation.z, glm::vec3(0, 0, 1));
-    modelMatrix = glm::rotate(modelMatrix, -referenceCamera->rotation.y, glm::vec3(0, 1, 0));
-    modelMatrix = glm::rotate(modelMatrix, -referenceCamera->rotation.x, glm::vec3(1, 0, 0));
+    // Check whether the `referencePoint` is within the provided `frustum` object,
+    //  seen from the `transformation` object.
 
-    glm::vec3 position = glm::vec3(modelMatrix * glm::vec4(referenceCamera->position, 1.0));
-*/
-    // Check whether the point is within the frustum
-    return true;/*glm::dot(relativePosition, frustum.top.normal) > 0 &&
-           glm::dot(relativePosition, frustum.bottom.normal) > 0 &&
-           glm::dot(position, frustum.left.normal) > 0; &&
-           glm::dot(relativePosition, frustum.right.normal) > 0 &&
-           glm::dot(relativePosition, frustum.near.normal * frustum.zNear) > 0 &&
-           glm::dot(relativePosition, frustum.far.normal * frustum.zFar) > 0;*/
+    // Calculate the relative position of the reference point
+    glm::vec3 relativePosition = referencePosition - transformation->position;
+
+    // Check whether the reference point is within the frustum
+    return
+            glm::dot(frustum.top.normal, relativePosition) < 0 &&
+            glm::dot(frustum.bottom.normal, relativePosition) < 0 &&
+            glm::dot(frustum.left.normal, relativePosition) < 0 &&
+            glm::dot(frustum.right.normal, relativePosition) < 0 &&
+            glm::dot(frustum.near.normal, relativePosition) < 0 &&
+            glm::dot(frustum.far.normal, relativePosition) < 0;
 }

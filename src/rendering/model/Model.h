@@ -8,7 +8,8 @@
 #include "glm/vec3.hpp"
 #include "../VBO.h"
 
-typedef struct {
+typedef struct
+{
     GLuint textureId;
     Vertex V1;
     Vertex V2;
@@ -26,7 +27,7 @@ public:
     size_t facesCount;
     VBO mesh;
 
-    static Model* loadObj(const char *filePath);
+    static Model *loadObj(const char *filePath);
 
 };
 

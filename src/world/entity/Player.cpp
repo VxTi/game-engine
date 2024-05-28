@@ -14,13 +14,14 @@ void Player::update(float deltaTime)
 void Player::handleInput(GLFWwindow *window, float deltaTime)
 {
     auto direction = glm::vec3(
-            (glfwGetKey(window, GLFW_KEY_W) - glfwGetKey(window, GLFW_KEY_S)),
-            (glfwGetKey(window, GLFW_KEY_SPACE) - glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)),
-            (glfwGetKey(window, GLFW_KEY_D) - glfwGetKey(window, GLFW_KEY_A))
+            ( glfwGetKey(window, GLFW_KEY_W) - glfwGetKey(window, GLFW_KEY_S)),
+            ( glfwGetKey(window, GLFW_KEY_SPACE) - glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)),
+            ( glfwGetKey(window, GLFW_KEY_D) - glfwGetKey(window, GLFW_KEY_A))
     );
 
     // Get the angle at which to move to
-    float angle = -this->yaw - 90.f + (direction.z != 0 ? (direction.x != 0 ? direction.z * 45.f : 0) : direction.z * 90.f);
+    float angle = -this->yaw - 90.f +
+                  ( direction.z != 0 ? ( direction.x != 0 ? direction.z * 45.f : 0 ) : direction.z * 90.f );
 
     // Get the rotation matrix
     glm::mat4 rotation = glm::rotate(

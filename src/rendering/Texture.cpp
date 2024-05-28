@@ -16,7 +16,7 @@ Texture Texture::loadFromResource(const char *resourceRelativePath)
     stbi_set_flip_vertically_on_load(true);
     stbi_uc *image_data = stbi_load(resourceRelativePath, &width, &height, &channels, 0);
 
-    if (!image_data)
+    if ( !image_data )
         throw std::runtime_error(stbi_failure_reason());
 
     Texture texture;
