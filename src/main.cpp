@@ -21,7 +21,7 @@ GLFWwindow *window;
 
 /** World object related variables */
 Player player = Player();
-World world;
+World *world;
 glm::vec3 sunPosition = glm::normalize(glm::vec3(5.0f, 5.0f, 3.0f));
 
 /** Rendering related variables */
@@ -45,6 +45,7 @@ int main()
         exit(1);
     }
 
+    world = new World();
     player.frictionConstant = 10.0f;
     player.position = vec3(10, 10, 10);
 
@@ -85,7 +86,8 @@ int main()
     skyboxShader = new Shader(shaderDirectory, "skybox");
     worldShader = new Shader(shaderDirectory, "world_rendering");
 
-    world.generate(player);
+    world->startWorldGeneration(&player);
+    world->worldObjects.push_back(&player);
 
     assembleSkyboxMesh();
 
@@ -141,8 +143,8 @@ int main()
         worldShader->uniformVec3("u_CameraPosition", player.position.x, player.position.y, player.position.z);
         worldShader->uniformFloat("u_time", timePassed);
 
-        world.render(deltaTime, &player, viewFrustum);
-        player.update(deltaTime);
+        world->render(deltaTime, &player, viewFrustum);
+        world->update(deltaTime);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -160,6 +162,7 @@ int main()
     delete skybox;
     delete skyboxShader;
     delete worldShader;
+    delete world;
 
     return 0;
 }
@@ -171,7 +174,7 @@ void assembleSkyboxMesh()
 {
     skybox = new VBO();
 
-    skybox->withVertices((Vertex[8]) {
+    skybox->withVertices((vertex_t[8]) {
             { -1, -1, -1, .5, .5, .5 },   // - - -
             { 1,  -1, -1, -.5, .5, .5 },  // + - -
             { 1,  -1, 1, -.5, .5, -.5 },  // + - +

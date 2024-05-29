@@ -8,7 +8,28 @@
 #include "Rendering.h"
 
 /**
- * A Vertex Buffer Object.
+ * A struct representing a vertex.
+ */
+typedef struct
+{
+    float x, y, z;
+    float nx, ny, nz;
+    float u, v;
+} vertex_t;
+
+/**
+ * Struct containing all mesh_data for a VBO mesh.
+ */
+typedef struct {
+    unsigned int indices_count;
+    unsigned int vertices_count;
+    unsigned int *indices;
+    vertex_t *vertices;
+    GLuint texture_id;
+} vbo_data_t;
+
+/**
+ * A vertex_t Buffer Object.
  */
 class VBO : public Drawable
 {
@@ -35,7 +56,7 @@ public:
     /**
      * Constructor for creating a new VBO
      * @param flags The flags of the VBO. These
-     * flags determine what kind of data the VBO
+     * flags determine what kind of mesh_data the VBO
      * will hold, such as vertex positions and colors.
      */
     explicit VBO();
@@ -51,45 +72,45 @@ public:
     ~VBO();
 
     /**
-     * Method for supplying vector data to the VBO.
-     * This method will pass the data onto the appropriate buffer,
+     * Method for supplying vector mesh_data to the VBO.
+     * This method will pass the mesh_data onto the appropriate buffer,
      * depending on the provided
      *
-     * @param data The data to withVertices to the VBO.
-     * @param segmentSize The size of each segment in the data.
-     * @param vectorDataType The kind of data that is being supplied.
+     * @param data The mesh_data to withVertices to the VBO.
+     * @param segmentSize The size of each segment in the mesh_data.
+     * @param vectorDataType The kind of mesh_data that is being supplied.
      */
-    void withVertices(std::vector<Vertex> vertices);
+    void withVertices(std::vector<vertex_t> vertices);
 
     /**
-     * Method for supplying vector data to the VBO.
-     * This method will pass the data onto the appropriate buffer,
-     * depending on the provided. Method is similar to `withVertices(std::vector<Vertex> vertices)`
+     * Method for supplying vector mesh_data to the VBO.
+     * This method will pass the mesh_data onto the appropriate buffer,
+     * depending on the provided. Method is similar to `withVertices(std::vector<vertex_t> vertices)`
      *
-     * @param data The data to withVertices to the VBO.
-     * @param segmentSize The vertexCount of each segment in the data.
-     * @param vectorDataType The kind of data that is being supplied.
+     * @param data The mesh_data to withVertices to the VBO.
+     * @param segmentSize The vertexCount of each segment in the mesh_data.
+     * @param vectorDataType The kind of mesh_data that is being supplied.
      */
-    void withVertices(Vertex *vertices, unsigned long vertexCount);
+    void withVertices(vertex_t *vertices, unsigned long vertexCount);
 
     /**
-     * Method for supplying index data to the VBO.
-     * This method will pass the data onto the appropriate buffer,
+     * Method for supplying index mesh_data to the VBO.
+     * This method will pass the mesh_data onto the appropriate buffer,
      * depending on the provided
-     * @param data The data to withVertices to the VBO.
-     * @param segmentSize The size of each segment in the data.
-     * @param vectorDataType The kind of data that is being supplied.
+     * @param data The mesh_data to withVertices to the VBO.
+     * @param segmentSize The size of each segment in the mesh_data.
+     * @param vectorDataType The kind of mesh_data that is being supplied.
      */
     void withIndices(std::vector<unsigned int> indices);
 
     /**
-     * Method for supplying index data to the VBO.
-     * This method will pass the data onto the appropriate buffer,
+     * Method for supplying index mesh_data to the VBO.
+     * This method will pass the mesh_data onto the appropriate buffer,
      * depending on the provided. Method is similar to `withIndices(std::vector<unsigned int> indices)`
      *
-     * @param data The data to withVertices to the VBO.
-     * @param segmentSize The indicesCount of each segment in the data.
-     * @param vectorDataType The kind of data that is being supplied.
+     * @param data The mesh_data to withVertices to the VBO.
+     * @param segmentSize The indicesCount of each segment in the mesh_data.
+     * @param vectorDataType The kind of mesh_data that is being supplied.
      */
     void withIndices(unsigned int *indices, unsigned long indicesCount);
 

@@ -6,7 +6,7 @@
 
 void Renderer::computeMatrices(float fov, float zNear, float zFar, float width, float height)
 {
-    // Model matrix = Vec4(World) = Mat4(Translate) * Mat4(Rotate) * Mat4(Scale) * Vec4(Vertex)
+    // Model matrix = Vec4(World) = Mat4(Translate) * Mat4(Rotate) * Mat4(Scale) * Vec4(vertex_t)
     // View matrix = Vec4(Camera) = Mat4(Camera) * Vec4(World)
 
     if ( this->renderMode == RENDER_MODE_3D ) {

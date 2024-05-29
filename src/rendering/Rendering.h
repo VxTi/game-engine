@@ -289,15 +289,5 @@ public:
 
 };
 
-/**
- * A struct representing a vertex.
- */
-typedef struct
-{
-    float x, y, z;
-    float nx, ny, nz;
-    float u, v;
-} Vertex;
-
 
 #endif //GRAPHICS_TEST_RENDERING_H

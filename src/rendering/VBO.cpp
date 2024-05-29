@@ -24,17 +24,17 @@ VBO::~VBO()
     glDeleteVertexArrays(1, &this->vaoId);
 }
 
-void VBO::withVertices(Vertex *vertices, unsigned long vertexCount)
+void VBO::withVertices(vertex_t *vertices, unsigned long vertexCount)
 {
     if ( vertexCount == 0 )
-        throw std::invalid_argument("Invalid data supplied to VBO");
+        throw std::invalid_argument("Invalid mesh_data supplied to VBO");
     glBindBuffer(GL_ARRAY_BUFFER, this->vboBufferId);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(vertex_t), vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 /** Supply the VBO with vertices */
-void VBO::withVertices(std::vector<Vertex> vertices)
+void VBO::withVertices(std::vector<vertex_t> vertices)
 {
     this->withVertices(vertices.data(), vertices.size());
 }
@@ -42,7 +42,7 @@ void VBO::withVertices(std::vector<Vertex> vertices)
 void VBO::withIndices(unsigned int *indices, unsigned long indicesCount)
 {
     if ( indicesCount == 0 )
-        throw std::invalid_argument("Invalid data supplied to VBO");
+        throw std::invalid_argument("Invalid mesh_data supplied to VBO");
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eboBufferId);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesCount * sizeof(int), indices, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -67,13 +67,13 @@ void VBO::build()
     glBindBuffer(GL_ARRAY_BUFFER, this->vboBufferId);
 
     glEnableVertexAttribArray(VBO_POSITION_INDEX);
-    glVertexAttribPointer(VBO_POSITION_INDEX, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *) offsetof(Vertex, x));
+    glVertexAttribPointer(VBO_POSITION_INDEX, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid *) offsetof(vertex_t, x));
 
     glEnableVertexAttribArray(VBO_NORMAL_INDEX);
-    glVertexAttribPointer(VBO_NORMAL_INDEX, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *) offsetof(Vertex, nx));
+    glVertexAttribPointer(VBO_NORMAL_INDEX, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid *) offsetof(vertex_t, nx));
 
     glEnableVertexAttribArray(VBO_UV_INDEX);
-    glVertexAttribPointer(VBO_UV_INDEX, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *) offsetof(Vertex, u));
+    glVertexAttribPointer(VBO_UV_INDEX, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_t), (GLvoid *) offsetof(vertex_t, u));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eboBufferId);
 

@@ -11,9 +11,9 @@
 typedef struct
 {
     GLuint textureId;
-    Vertex V1;
-    Vertex V2;
-    Vertex V3;
+    vertex_t V1;
+    vertex_t V2;
+    vertex_t V3;
 } Face;
 
 /**
