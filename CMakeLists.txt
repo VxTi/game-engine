@@ -26,6 +26,8 @@ add_executable(graphics_test src/main.cpp src/rendering/VBO.cpp src/rendering/Sh
         src/rendering/model/Mesh.h
         src/math/QuadTree.h
         src/math/QuadTree.cpp
+        src/math/OcTree.cpp
+        src/math/OcTree.h
 )
 
 target_link_libraries(graphics_test ${PROJECT_SOURCE_DIR}/libraries/libglfw3.a)

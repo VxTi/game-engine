@@ -11,18 +11,25 @@
 #include "entity/Entity.h"
 #include "entity/Player.h"
 
-#define CHUNK_SIZE (32)
-#define CHUNK_GENERATION_MAX_HEIGHT (50)
-#define CHUNK_GENERATION_RANDOM_BIAS_FACTOR (0.1f)
+#define CHUNK_SIZE (64)
 #define CHUNK_BASE_WATER_LEVEL (10.0f)
+#define CHUNK_GENERATION_MAX_HEIGHT (50)
 #define CHUNK_BIOME_COUNT (5)
 #define CHUNK_GENERATION_NORMAL_DELTA (0.1f)
 
-typedef struct {
+typedef struct chunk_t {
     VBO *mesh;
     float *height_map; // Size is always CHUNK_SIZE^2
     int32_t x;
     int32_t z;
+
+    // For checking whether the chunk is the same.
+    // This is always the case if the coordinates are the same due
+    // to how world generation works.
+    bool operator==(const chunk_t &reference) const
+    {
+        return x == reference.x && z == reference.z;
+    }
 } chunk_t;
 
 typedef struct {
@@ -35,21 +42,27 @@ class World
 
 private:
     /**
-     * The thread that will generate the chunks of the world.
+     * The thread that will generate the chunkMap of the world.
      * This thread is responsible for performing all the calculations
      * regarding the chunk generation.
      */
     std::thread *worldGenerationThread;
 
     /**
-     * The queue of chunks that need their meshes to be generated.e
+     * Mutex for locking the generation of chunkMap to prevent
+     * duplicate chunk generation.
      */
-    std::queue<immature_chunk_data_t *> chunkMeshGenerationQueue;
+    std::mutex worldGenerationMutex;
+
+    /**
+     * The queue of chunkMap that need their meshes to be generated.e
+     */
+    std::queue<immature_chunk_data_t *> *chunkMeshGenerationQueue;
 
 public:
-    std::vector<chunk_t *> chunks;
-    std::vector<Updatable *> worldObjects;
-    std::vector<Drawable *> drawables;
+    std::unordered_map<std::size_t, chunk_t *> *chunkMap;
+    std::vector<Updatable *> *worldObjects;
+    std::vector<Drawable *> *drawables;
 
     /**
      * Chunk generation octaves.

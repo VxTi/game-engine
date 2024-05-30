@@ -87,7 +87,7 @@ int main()
     worldShader = new Shader(shaderDirectory, "world_rendering");
 
     world->startWorldGeneration(&player);
-    world->worldObjects.push_back(&player);
+    world->worldObjects->push_back(&player);
 
     assembleSkyboxMesh();
 

@@ -110,7 +110,6 @@ void main()
     vec3 resultingPosition = position;
     ioNormal = normal;
     ioFragPos = vec3(u_ModelMatrix * vec4(position, 1.0));
-
     if ( position.y <= 0)
     {
         float y = waveFunction(vec2(position.x, position.z));

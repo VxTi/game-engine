@@ -24,7 +24,7 @@ public:
 
     void update(float deltaTime);
 
-    const float movementSpeedForce = 1000.0f;
+    const float movementSpeedForce = 10000.0f;
 
     /**
      * Move the player by the given amount.
