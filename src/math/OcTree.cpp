@@ -91,34 +91,6 @@ void OcTree<T>::createBranch(octree_node_t<T> node, double x, double y, double z
 }
 
 /**
- * Create the branches of the octree at the given
- */
-template<typename T>
-void OcTree<T>::createBranches(double x, double y, double z)
-{
-    int currentDepth = this->depth;
-    octree_octant_t octant = getOctant(x, y, z);
-    octree_node_t<T> *node = this->root;
-
-    for ( ; currentDepth >= 0; currentDepth-- ) {
-        // If the node doesn't have children yet, create them.
-        createBranch(node, x, y, z);
-
-        // If the current depth is 0, we're done (it's a leaf!)
-        if ( currentDepth <= 0 )
-            break;
-        node = node->children[octant];
-
-        // Subdivide coordinates for next iteration
-        x = (((int) x) / 2) * 2;
-        y = (((int) y) / 2) * 2;
-        z = (((int) z) / 2) * 2;
-
-        octant = getOctant(x, y, z);
-    }
-}
-
-/**
  * Whether the octree has a node at the given coordinates.
  */
 template<typename T>
@@ -139,6 +111,12 @@ bool OcTree<T>::hasNode(double x, double y, double z)
             return node->nodeData->data != nullptr;
 
         node = node->children[octant];
+
+        // Subdivide coordinates for next iteration
+        x = (((int) x) / 2) * 2;
+        y = (((int) y) / 2) * 2;
+        z = (((int) z) / 2) * 2;
+
         octant = getOctant(x, y, z);
     }
 }
@@ -163,10 +141,6 @@ void OcTree<T>::insert(double x, double y, double z, T *referenceData, size_t da
         return;
     }
 
-    // Insert into the octree
-    this->data[this->dataCursor] = referenceData;
-    this->dataCursor++;
-
     octree_octant_t octant = getOctant(x, y, z);
     octree_node_t<T> *node = this->root;
     int currentDepth = this->depth;
@@ -176,11 +150,21 @@ void OcTree<T>::insert(double x, double y, double z, T *referenceData, size_t da
         if ( currentDepth <= 0 ) {
             node->nodeData->data = referenceData;
             node->nodeData->dataLength = dataLength;
+            node->nodeData->arrayIndex = this->dataCursor;
             break;
         }
         node = node->children[octant];
+
+        // Subdivide coordinates for next iteration
+        x = (((int) x) / 2) * 2;
+        y = (((int) y) / 2) * 2;
+        z = (((int) z) / 2) * 2;
         octant = getOctant(x, y, z);
     }
+
+    // Insert into the octree
+    memcpy(this->data[this->dataCursor], referenceData, dataLength);
+    this->dataCursor += dataLength;
 }
 
 template<typename T>

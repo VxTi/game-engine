@@ -16,12 +16,9 @@ void main()
 {
     vec3 objectColor = vec3(1, 1, .9);
 
-    float opacity = 1.0f;
-
     if (ioPosition.y <= 1)
     {
         objectColor = vec3(0.2, 0.25, 0.3);
-        opacity = .8;
     }
 
     vec3 normal = normalize(ioNormal);
@@ -45,5 +42,5 @@ void main()
 
     vec3 result = (ambient + diffuse + specular) * objectColor;
 
-    FragColor = vec4(result, opacity);
+    FragColor = vec4(result, 1);
 }

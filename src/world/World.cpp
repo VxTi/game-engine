@@ -18,24 +18,19 @@ void world_generation_fn(World *world, Transformation *observationPoint)
 
     // Generate chunkMap around the observation point in a circular manner
     int32_t x, z, px, pz;
-    const int chunk_generation_radius = 10;
     // Wait until the thread is stopped
-    std::chrono::milliseconds interval(1);
+    std::chrono::nanoseconds interval(100);
 
     while ( true ) {
-        if ( world->chunkMap->size() > 1000)
+        if ( world->chunkMap->size() > 5000 )
             return;
-        px = (((int32_t) observationPoint->position.x) / CHUNK_SIZE) * CHUNK_SIZE;
-        pz = ((int32_t) observationPoint->position.z) / CHUNK_SIZE * CHUNK_SIZE;
+        px = (((int32_t) observationPoint->position.x ) / (int) (CHUNK_COORDINATE_SCALAR)) *
+                CHUNK_SIZE;
+        pz = (((int32_t) observationPoint->position.z ) / (int) (CHUNK_COORDINATE_SCALAR)) *
+             CHUNK_SIZE;
 
-        std::cout << "Generating chunkMap around " << px << ", " << pz << std::endl;
-
-        // TODO: Implement chunk generation in a circular manner
-        
-
-
-        for ( x = -chunk_generation_radius; x < chunk_generation_radius; x++ ) {
-            for ( z = -chunk_generation_radius; z < chunk_generation_radius; z++ ) {
+        for ( x = -CHUNK_DRAW_DISTANCE; x < CHUNK_DRAW_DISTANCE; x++ ) {
+            for ( z = -CHUNK_DRAW_DISTANCE; z < CHUNK_DRAW_DISTANCE; z++ ) {
                 std::this_thread::sleep_for(interval);
                 world->generateChunk(
                         px + x * CHUNK_SIZE,
@@ -64,13 +59,28 @@ void World::startWorldGeneration(Transformation *observationPoint)
     worldGenerationThread = new std::thread(world_generation_fn, this, observationPoint);
 }
 
-void World::render(float deltaTime, Transformation *transformation, Frustum frustum)
+inline bool shouldRenderChunk(chunk_t &chunk, Frustum *frustum)
 {
-    for ( auto chunkPair: *chunkMap ) {
+    //return frustum->isWithin(vec3(chunk.x + offset, 0, chunk.z + offset), offset * 2);
 
-        // TODO: Implement frustum culling
+    return frustum->isWithin(vec3(chunk.x, 0, chunk.z),
+                             CHUNK_SIZE * CHUNK_COORDINATE_SCALING_FACTOR);
+}
+
+/**
+ * Render the world.
+ * This function will render all the chunkMap that are within the frustum.
+ */
+void World::render(float deltaTime, Frustum *frustum)
+{
+    int chunksRendered = 0;
+    for ( auto chunkPair: *chunkMap ) {
+        if ( !shouldRenderChunk(*chunkPair.second, frustum))
+            continue;
         chunkPair.second->mesh->draw(deltaTime);
+        chunksRendered++;
     }
+    std::cout << "Chunks rendered: " << chunksRendered << " / " << chunkMap->size() << std::endl;
     for ( Drawable *drawable: *drawables ) {
         drawable->draw(0);
     }
@@ -88,7 +98,7 @@ void World::render(float deltaTime, Transformation *transformation, Frustum frus
  */
 size_t chunk_hash(int32_t x, int32_t z)
 {
-    return ((x << 16) | (z & 0xFFFF)) ^ 0x9e3779b9;
+    return (( x << 16 ) | ( z & 0xFFFF )) ^ 0x9e3779b9;
 }
 
 /**
@@ -113,7 +123,7 @@ static float getChunkHeight(float x, float z)
     float resultingHeight = 0.0f;
 
     for ( auto octave: World::CHUNK_GENERATION_OCTAVES ) {
-        resultingHeight += SimplexNoise::noise( x / octave[ 0 ] ,  z / octave[ 0 ]) * octave[ 1 ];
+        resultingHeight += SimplexNoise::noise(x / octave[ 0 ], z / octave[ 0 ]) * octave[ 1 ];
     }
     resultingHeight = ( resultingHeight ) * CHUNK_GENERATION_MAX_HEIGHT;
     return biome_height_factor * resultingHeight;
@@ -139,7 +149,7 @@ static vec3 getNormalVector(float x, float z)
  * Generate the mesh for a chunk.
  * This function will startWorldGeneration a mesh with the provided vertices and indices.
  */
-void World::generateChunkMesh(chunk_t *chunk, vbo_data_t *vbo_data)
+void World::generateChunkMesh(chunk_t *chunk, vbo_data_t *vbo_data) const
 {
     VBO *mesh = new VBO();
     mesh->withVertices(vbo_data->vertices, vbo_data->vertices_count);
@@ -147,14 +157,14 @@ void World::generateChunkMesh(chunk_t *chunk, vbo_data_t *vbo_data)
     mesh->build();
     chunk->mesh = mesh;
     // Add chunk to world
-    chunkMap->insert({chunk_hash(chunk->x, chunk->z), chunk});
+    chunkMap->insert({ chunk_hash(chunk->x, chunk->z), chunk });
     // Free old memory, it's been copied video memory.
     free(vbo_data->indices);
     free(vbo_data->vertices);
     free(vbo_data);
 }
 
-void World::update(float deltaTime)
+void World::update(float deltaTime) const
 {
     for ( Updatable *updatable: *worldObjects ) {
         updatable->update(deltaTime);
@@ -171,8 +181,7 @@ void World::generateChunk(int32_t x, int32_t z)
     worldGenerationMutex.lock();
 
     // Check if the chunk already exists
-    if ( chunkMap->find(chunk_hash(x, z)) != chunkMap->end())
-    {
+    if ( chunkMap->find(chunk_hash(x, z)) != chunkMap->end()) {
         worldGenerationMutex.unlock();
         return;
     }
@@ -199,27 +208,27 @@ void World::generateChunk(int32_t x, int32_t z)
 
     glm::vec3 normal;
 
+    float delta = 0.5f;
+
     // Generate height chunk_mesh_data points
     for ( i = 0; i <= CHUNK_SIZE; i++ ) {
-        for (j = 0; j <= CHUNK_SIZE; j++)
-        {
+        for ( j = 0; j <= CHUNK_SIZE; j++ ) {
             // Calculate height for chunk at specific coordinate
             chunk_x = x + i;
             chunk_z = z + j;
-            cx = (float) chunk_x - 0.5f;
-            cz = (float) chunk_z - 0.5f;
+            cx = (((float) chunk_x ) - delta ) * CHUNK_COORDINATE_SCALING_FACTOR;
+            cz = (((float) chunk_z ) - delta ) * CHUNK_COORDINATE_SCALING_FACTOR;
             cy = getChunkHeight(cx, cz);
 
             normal = getNormalVector(cx, cz);
             // Add regular vertex
             vertices[ vertices_index++ ] = {
-                    cx , cy, cz,
+                    cx, cy, cz,
                     normal.x, normal.y, normal.z
             };
 
-            // Don't add indices for the last row and column
-
-            if (i < CHUNK_SIZE && j < CHUNK_SIZE) {
+            // Generate indices for the mesh
+            if ( i < CHUNK_SIZE && j < CHUNK_SIZE) {
 
                 data_points[ i * CHUNK_SIZE + j ] = cy;
 
@@ -239,10 +248,11 @@ void World::generateChunk(int32_t x, int32_t z)
         }
     }
 
+    // Create chunk object
     auto *generated = (chunk_t *) malloc(sizeof(chunk_t));
     generated->height_map = data_points;
-    generated->x = x;
-    generated->z = z;
+    generated->x = x * CHUNK_COORDINATE_SCALING_FACTOR;
+    generated->z = z * CHUNK_COORDINATE_SCALING_FACTOR;
 
     // Store chunk_mesh_data in destination. The memory can be freed
     // after the mesh has been generated.
@@ -274,8 +284,7 @@ World::~World()
     }
 
     // Clear the chunk map
-    for ( auto entry : *chunkMap)
-    {
+    for ( auto entry: *chunkMap ) {
         free(entry.second->height_map);
         delete entry.second->mesh;
         free(entry.second);

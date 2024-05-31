@@ -93,7 +93,7 @@ float waveFunction( vec2 p )
 
     float amp = 6.*small_waveheight;
     shift1 *= .3;
-    for (int i=0; i<7; i++)
+    for (int i=0; i<4; i++)
     {
         wave -= abs(sin((noise(p*0.01+shift1)-.5)*3.14))*amp;
         amp *= .51;

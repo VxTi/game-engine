@@ -124,6 +124,12 @@ public:
      */
     void draw(float deltaTime) override;
 
+    /**
+     * Function that checks whether the object is within the provided frustum.
+     * @param frustum The frustum to check against
+     */
+    /*bool isWithinFrustum(Frustum frustum) override;*/
+
 };
 
 #endif //GRAPHICS_TEST_VBO_H

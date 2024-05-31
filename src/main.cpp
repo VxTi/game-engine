@@ -6,18 +6,22 @@
 #include "world/entity/Player.h"
 #include "world/SimplexNoise.h"
 #include "world/World.h"
+#include "rendering/culling/Frustum.h"
 
 using namespace std::chrono;
 
 #define VSYNC_ENABLED 1
 
 #define NEAR_PLANE 0.1f
-#define FAR_PLANE 10000.0f
+#define FAR_PLANE 50000.0f
+#define SKYBOX_SIZE (FAR_PLANE / 2)
 #define FOV 70.0f
+
+bool wireframe = false;
 
 /** Window related variables */
 GLint width, height;
-GLFWwindow *window;
+GLFWwindow *mainWindow;
 
 /** World object related variables */
 Player player = Player();
@@ -28,7 +32,7 @@ glm::vec3 sunPosition = glm::normalize(glm::vec3(5.0f, 5.0f, 3.0f));
 Shader *worldShader, *skyboxShader;
 Renderer renderer;
 VBO *skybox;
-Frustum viewFrustum;
+Frustum *viewFrustum;
 
 
 const std::string shaderDirectory = "/Users/lucawarm/Jetbrains/CLion/graphics-test/shaders/";
@@ -57,29 +61,29 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(1200, 700, "Window Test", NULL, NULL);
+    mainWindow = glfwCreateWindow(1200, 700, "Window Test", NULL, NULL);
 
-    if ( !window ) {
+    if ( !mainWindow ) {
         std::cout << "Failed to create window" << std::endl;
         glfwTerminate();
         exit(1);
     }
 
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height) {
+    glfwSetFramebufferSizeCallback(mainWindow, [](GLFWwindow *window, int width, int height) {
         ::width = width;
         ::height = height;
     });
 
-    glfwSetScrollCallback(window, [](GLFWwindow *window, double xoffset, double yoffset) {
+    glfwSetScrollCallback(mainWindow, [](GLFWwindow *window, double xoffset, double yoffset) {
         player.pitch = fmod(player.pitch - yoffset * scrollFactor.x, 360.0f);
         player.yaw = fmod(player.yaw + xoffset * scrollFactor.y, 360.0f);
         player.pitch = glm::clamp(player.pitch, -90.0f, 90.0f);
     });
 
-    glfwSetKeyCallback(window, keyCallback);
+    glfwSetKeyCallback(mainWindow, keyCallback);
 
-    glfwMakeContextCurrent(window);
-    glfwGetFramebufferSize(window, &width, &height);
+    glfwMakeContextCurrent(mainWindow);
+    glfwGetFramebufferSize(mainWindow, &width, &height);
     glViewport(0, 0, width, height);
     glfwSwapInterval(VSYNC_ENABLED);
 
@@ -91,15 +95,16 @@ int main()
 
     assembleSkyboxMesh();
 
-    viewFrustum = createFrustum(NEAR_PLANE, FAR_PLANE, FOV, (float) width / (float) height);
+    viewFrustum = new Frustum(
+            &player,
+            glm::mat4(1.0f) ,
+            glm::mat4(1.0f)
+            );
 
     duration lastTime = system_clock::now().time_since_epoch();
     duration currentTime = system_clock::now().time_since_epoch();
     float deltaTime = 1.0;
     float timePassed = 0.0;
-
-    // Wireframes
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     renderer.setRenderMode(RENDER_MODE_3D);
 
@@ -111,7 +116,7 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    while ( !glfwWindowShouldClose(window)) {
+    while ( !glfwWindowShouldClose(mainWindow)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -120,8 +125,9 @@ int main()
         renderer.resetMatrices();
         renderer.rotateX(glm::radians(player.pitch));
         renderer.rotateY(glm::radians(player.yaw));
-        renderer.scale(FAR_PLANE / 2);
+        renderer.scale(SKYBOX_SIZE);
         renderer.computeMatrices(FOV, NEAR_PLANE, FAR_PLANE, (float) width, (float) height);
+        renderer.updateFrustum(viewFrustum);
         skyboxShader->uniformVec2("u_Resolution", (float) width, (float) height);
         skyboxShader->uniformFloat("u_SunSize", .15f);
         skyboxShader->uniformVec3("u_SunPosition", sunPosition.x, sunPosition.y, sunPosition.z);
@@ -143,10 +149,10 @@ int main()
         worldShader->uniformVec3("u_CameraPosition", player.position.x, player.position.y, player.position.z);
         worldShader->uniformFloat("u_time", timePassed);
 
-        world->render(deltaTime, &player, viewFrustum);
+        world->render(deltaTime, viewFrustum);
         world->update(deltaTime);
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(mainWindow);
         glfwPollEvents();
 
         // Update delta time
@@ -155,7 +161,7 @@ int main()
         deltaTime = (float) duration_cast<microseconds>(currentTime - lastTime).count() / 1000000.0f;
         timePassed += deltaTime;
     }
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(mainWindow);
     glfwTerminate();
 
     // Free up some memory
@@ -207,8 +213,8 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
                 glfwSetWindowShouldClose(window, GLFW_TRUE);
                 break;
             case GLFW_KEY_L:
-                std::cout << "Player position: " << player.position.x << ", " << player.position.y << ", "
-                          << player.position.z << std::endl;
+                wireframe = !wireframe;
+                glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
                 break;
             default:
                 break;

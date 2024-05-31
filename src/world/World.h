@@ -10,10 +10,15 @@
 #include "../rendering/Rendering.h"
 #include "entity/Entity.h"
 #include "entity/Player.h"
+#include "../rendering/culling/Frustum.h"
 
+#define CHUNK_DRAW_DISTANCE (15)
 #define CHUNK_SIZE (64)
 #define CHUNK_BASE_WATER_LEVEL (10.0f)
-#define CHUNK_GENERATION_MAX_HEIGHT (50)
+#define CHUNK_COORDINATE_SCALING_FACTOR (20.0f)
+#define CHUNK_COORDINATE_SCALAR (CHUNK_COORDINATE_SCALING_FACTOR * CHUNK_SIZE)
+
+#define CHUNK_GENERATION_MAX_HEIGHT (25)
 #define CHUNK_BIOME_COUNT (5)
 #define CHUNK_GENERATION_NORMAL_DELTA (0.1f)
 
@@ -73,7 +78,7 @@ public:
      */
     static constexpr float CHUNK_GENERATION_OCTAVES[][2] = {
             { 200, 30 },
-            { 4,   1 },
+            { 4,   5 },
             { 4,   .1 },
             { 1,   .005 }
     };
@@ -81,9 +86,7 @@ public:
      * The biome height scaling factors.
      * These factors are used to scale the height of the terrain based on the biome.
      */
-    static constexpr float BIOME_HEIGHT_SCALING_FACTORS[CHUNK_BIOME_COUNT] = { 0.5f, 0.7f, 1.0f, 1.2f, 1.5f };
-
-
+    static constexpr float BIOME_HEIGHT_SCALING_FACTORS[CHUNK_BIOME_COUNT] = { 0.5f, 0.7f, 1.0f, 1.2f, 2.0f };
 
     /**
      * Destructor
@@ -92,9 +95,9 @@ public:
 
     void startWorldGeneration(Transformation *observationPoint);
 
-    void render(float deltaTime, Transformation *transformation, Frustum frustum);
+    void render(float deltaTime, Frustum *frustum);
 
-    void update(float deltaTime);
+    void update(float deltaTime) const;
 
     /**
      * Function for generating a chunk at a certain position.
@@ -109,7 +112,7 @@ public:
      *
      * @param chunk The chunk to startWorldGeneration the mesh for.
      */
-    void generateChunkMesh(chunk_t *chunk, vbo_data_t *vbo_data);
+    void generateChunkMesh(chunk_t *chunk, vbo_data_t *vbo_data) const;
 };
 
 

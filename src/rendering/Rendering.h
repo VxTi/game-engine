@@ -9,6 +9,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "Transformation.h"
 #include <OpenGL/gl3.h>
 #include "GLFW/glfw3.h"
 #include <vector>
@@ -21,50 +22,6 @@ using namespace glm;
 #define VBO_POSITION_INDEX 0
 #define VBO_NORMAL_INDEX 1
 #define VBO_UV_INDEX 2
-
-
-/**
- * Struct representing a frustum edge plane.
- * This contains all the points that define the plane.
- */
-typedef struct
-{
-    vec3 normal;
-} Plane;
-
-/**
- * Struct representing a
- */
-typedef struct
-{
-    Plane top;
-    Plane bottom;
-    Plane left;
-    Plane right;
-    Plane near;
-    Plane far;
-    float zFar;
-    float zNear;
-    float aspect;
-    float fov;
-} Frustum;
-
-class Transformation
-{
-public:
-    vec3 position;
-    vec3 scale;
-    union
-    {
-        vec3 rotation;
-        struct
-        {
-            float pitch;
-            float yaw;
-            float roll;
-        };
-    };
-};
 
 /**
  * Class representing a drawable object.
@@ -82,7 +39,7 @@ public:
      * @param frustum The frustum to check against
      * @return Whether the object is within the frustum
      */
-    /*virtual bool isWithinFrustum(Frustum frustum);*/
+    /* TODO: Implement */ /*virtual bool isWithinFrustum(Frustum frustum);*/
 };
 
 /**
@@ -94,29 +51,7 @@ public:
     virtual void update(float deltaTime) = 0;
 };
 
-
-/**
- * Function for creating a new frustum.
- *
- * @param zNear The near clipping plane
- * @param zFar  The far clipping plane
- * @param fov   The field of view
- * @param aspect The aspect ratio of the frustum
- * @return A new frustum
- */
-Frustum createFrustum(float zNear, float zFar, float fov, float aspect);
-
-/**
- * Function for checking whether the provided point lies within the view frustum.
- * This function checks whether the provided point lies within all planes of the frustum.
- *
- * @param reference The camera to check the frustum for
- * @param frustum The reference view frustum to check against
- * @param referencePosition The position to check
- * @return Whether the point lies within the frustum
- */
-bool isWithinFrustum(Transformation *reference, Frustum frustum, vec3 referencePosition);
-
+#include "culling/Frustum.h"
 
 class Renderer : public Transformation
 {
@@ -142,6 +77,11 @@ public:
      * Function that prepares the object for rendering.
      */
     void pushMatrices(GLuint programId);
+
+    /**
+     * Updates the provided frustum with the previously calculated matrices.
+     */
+    void updateFrustum(Frustum *frustum);
 
     /**
      * Function that translates the object.

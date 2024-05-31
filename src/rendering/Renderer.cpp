@@ -32,6 +32,11 @@ void Renderer::computeMatrices(float fov, float zNear, float zFar, float width, 
     }
 }
 
+void Renderer::updateFrustum(Frustum *frustum)
+{
+    frustum->updateViewProjectionMatrix(this->viewMatrix, this->projectionMatrix);
+}
+
 void Renderer::pushMatrices(GLuint shaderProgramId)
 {
     glUniformMatrix4fv(

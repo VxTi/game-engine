@@ -46,7 +46,6 @@ private:
 
     octree_node_t<T> *root;
 
-    void createBranches(double x, double y, double z);
     void createBranch(octree_node_t<T> node, double x, double y, double z);
 
 public:
