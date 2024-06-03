@@ -2,11 +2,11 @@
 // Created by Luca Warmenhoven on 24/05/2024.
 //
 
-#include "Mesh.h"
+#include "mesh.h"
 
 #include <iostream>
 
-Mesh::Mesh(VBO *buffer, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) : Drawable(position, scale, rotation)
+Mesh::Mesh(VBO *buffer, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
     this->buffer = buffer;
 }

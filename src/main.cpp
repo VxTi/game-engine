@@ -1,12 +1,15 @@
 #include <iostream>
-#include "rendering/Rendering.h"
-#include "rendering/VBO.h"
+#include "rendering/renderer.h"
+#include "rendering/vbo.h"
 #include "io/Files.h"
-#include "rendering/Shader.h"
-#include "world/entity/Player.h"
-#include "world/SimplexNoise.h"
-#include "world/World.h"
-#include "rendering/culling/Frustum.h"
+#include "rendering/shader.h"
+#include "world/entity/player.h"
+#include "world/noise.h"
+#include "world/world.h"
+#include "rendering/culling/frustum.h"
+
+#include <filesystem>
+
 
 using namespace std::chrono;
 
@@ -30,12 +33,9 @@ glm::vec3 sunPosition = glm::normalize(glm::vec3(5.0f, 5.0f, 3.0f));
 
 /** Rendering related variables */
 Shader *worldShader, *skyboxShader;
-Renderer renderer;
 VBO *skybox;
 Frustum *viewFrustum;
 
-
-const std::string shaderDirectory = "/Users/lucawarm/Jetbrains/CLion/graphics-test/shaders/";
 const glm::vec2 scrollFactor = glm::vec2(1.f, 1.f);
 
 void assembleSkyboxMesh();
@@ -72,6 +72,7 @@ int main()
     glfwSetFramebufferSizeCallback(mainWindow, [](GLFWwindow *window, int width, int height) {
         ::width = width;
         ::height = height;
+        glViewport(0, 0, width, height);
     });
 
     glfwSetScrollCallback(mainWindow, [](GLFWwindow *window, double xoffset, double yoffset) {
@@ -87,8 +88,16 @@ int main()
     glViewport(0, 0, width, height);
     glfwSwapInterval(VSYNC_ENABLED);
 
-    skyboxShader = new Shader(shaderDirectory, "skybox");
-    worldShader = new Shader(shaderDirectory, "world_rendering");
+    std::cout << std::filesystem::current_path().relative_path() << std::endl;
+
+    skyboxShader = new Shader(
+            "/Users/lucawarm/Jetbrains/CLion/graphics-test/shaders/skybox_frag.glsl",
+            "/Users/lucawarm/Jetbrains/CLion/graphics-test/shaders/skybox_vert.glsl"
+            );
+    worldShader = new Shader(
+            "/Users/lucawarm/Jetbrains/CLion/graphics-test/shaders/world_rendering_frag.glsl",
+            "/Users/lucawarm/Jetbrains/CLion/graphics-test/shaders/world_rendering_vert.glsl"
+            );
 
     world->startWorldGeneration(&player);
     world->worldObjects->push_back(&player);
@@ -106,15 +115,19 @@ int main()
     float deltaTime = 1.0;
     float timePassed = 0.0;
 
-    renderer.setRenderMode(RENDER_MODE_3D);
+    Renderer::setRenderMode(RENDER_MODE_3D);
 
     glEnable(GL_ALPHA);
     glEnable(GL_BLEND);
     glEnable(GL_CULL_FACE);
+    glEnable(GL_MULTISAMPLE);
     glCullFace(GL_CCW);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
+
+    // Send constants to the shader
+    skyboxShader->bind();
 
     while ( !glfwWindowShouldClose(mainWindow)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -122,32 +135,44 @@ int main()
 
         /** Skybox rendering */
         skyboxShader->bind();
-        renderer.resetMatrices();
-        renderer.rotateX(glm::radians(player.pitch));
-        renderer.rotateY(glm::radians(player.yaw));
-        renderer.scale(SKYBOX_SIZE);
-        renderer.computeMatrices(FOV, NEAR_PLANE, FAR_PLANE, (float) width, (float) height);
-        renderer.updateFrustum(viewFrustum);
+        Renderer::resetMatrices();
+        Renderer::rotateX(glm::radians(player.pitch));
+        Renderer::rotateY(glm::radians(player.yaw));
+        Renderer::scale(SKYBOX_SIZE);
+        Renderer::computeMatrices(FOV, NEAR_PLANE, FAR_PLANE, (float) width, (float) height);
+        Renderer::updateFrustum(viewFrustum);
+
+        // Send the uniforms to the shader
         skyboxShader->uniformVec2("u_Resolution", (float) width, (float) height);
-        skyboxShader->uniformFloat("u_SunSize", .15f);
-        skyboxShader->uniformVec3("u_SunPosition", sunPosition.x, sunPosition.y, sunPosition.z);
-        renderer.pushMatrices(skyboxShader->getProgramId());
+        skyboxShader->uniformFloat("u_SunSize", World::sunSize);
+        skyboxShader->uniformFloat("u_SunIntensity", World::sunIntensity);
+        skyboxShader->uniformFloat("u_SunAmbient", World::sunAmbient);
+        skyboxShader->uniformVec3("u_SunPosition", World::sunPosition);
+        skyboxShader->uniformVec4("u_SunColor", World::sunColor);
+        skyboxShader->uniformFloat("u_FogDensity", World::fogDensity);
+
+        Renderer::pushMatrices(skyboxShader->getProgramId());
         skybox->draw(deltaTime);
 
-
-        renderer.resetMatrices();
-        renderer.translate(glm::vec4(player.position, 1.0f));
-        renderer.rotate(glm::vec4(glm::radians(player.pitch), glm::radians(player.yaw), 0.0, 0.0));
+        Renderer::resetMatrices();
+        Renderer::translate(glm::vec4(player.position, 1.0f));
+        Renderer::rotate(glm::vec4(glm::radians(player.pitch), glm::radians(player.yaw), 0.0, 0.0));
 
         /** World rendering section */
         worldShader->bind();
-        renderer.computeMatrices(FOV, NEAR_PLANE, FAR_PLANE, (float) width, (float) height);
-        renderer.pushMatrices(worldShader->getProgramId());
+        Renderer::computeMatrices(FOV, NEAR_PLANE, FAR_PLANE, (float) width, (float) height);
+        Renderer::pushMatrices(worldShader->getProgramId());
 
         // Provide camera position to shader
         worldShader->uniformVec3("u_SunPosition", sunPosition.x, sunPosition.y, sunPosition.z);
         worldShader->uniformVec3("u_CameraPosition", player.position.x, player.position.y, player.position.z);
         worldShader->uniformFloat("u_time", timePassed);
+
+        worldShader->uniformFloat("u_SunIntensity", World::sunIntensity);
+        worldShader->uniformFloat("u_SunAmbient", World::sunAmbient);
+        worldShader->uniformVec3("u_SunPosition", World::sunPosition);
+        worldShader->uniformVec4("u_SunColor", World::sunColor);
+        worldShader->uniformFloat("u_FogDensity", World::fogDensity);
 
         world->render(deltaTime, viewFrustum);
         world->update(deltaTime);
@@ -174,7 +199,21 @@ int main()
 }
 
 /**
- * Function for creating the skybox mesh
+ * Function for sending the standard shader uniforms to the shader
+ * @param shader The shader to send the uniforms to
+ */
+void sendStandardShaderUniforms(Shader &shader)
+{
+    shader.uniformFloat("u_SunSize", World::sunSize);
+    shader.uniformFloat("u_SunIntensity", World::sunIntensity);
+    shader.uniformFloat("u_SunAmbient", World::sunAmbient);
+    shader.uniformVec3("u_SunPosition", World::sunPosition);
+    shader.uniformVec4("u_SunColor", World::sunColor);
+    shader.uniformFloat("u_FogDensity", World::fogDensity);
+}
+
+/**
+ * Function for creating the skybox Mesh
  */
 void assembleSkyboxMesh()
 {

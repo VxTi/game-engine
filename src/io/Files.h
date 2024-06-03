@@ -27,7 +27,9 @@ public:
      * @param path The path to the file
      * @return A File struct
      */
-    static std::string readFile(const char *path);
+    static std::string read(const char *path);
+
+    static void read(const char *path, char **buffer, long *size);
 
 };
 

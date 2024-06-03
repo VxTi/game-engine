@@ -7,7 +7,7 @@
 #include <iostream>
 #include <fstream>
 
-std::string Files::readFile(const char *path)
+std::string Files::read(const char *path)
 {
     std::ifstream file;
     file.open(path);
@@ -22,4 +22,22 @@ std::string Files::readFile(const char *path)
     }
     file.close();
     return source;
+}
+
+void Files::read(const char *path, char **buffer, long *size)
+{
+    std::ifstream file;
+    file.open(path, std::ios::binary);
+    if ( !file ) {
+        std::cout << "Failed to open file: " << path << std::endl;
+        *buffer = nullptr;
+        *size = 0;
+        return;
+    }
+    file.seekg(0, std::ios::end);
+    *size = file.tellg();
+    file.seekg(0, std::ios::beg);
+    *buffer = new char[*size];
+    file.read(*buffer, *size);
+    file.close();
 }

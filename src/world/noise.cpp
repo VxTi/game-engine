@@ -24,7 +24,7 @@
  * or copy at http://opensource.org/licenses/MIT)
  */
 
-#include "SimplexNoise.h"
+#include "noise.h"
 
 #include <cstdint>  // int32_t/uint8_t
 
@@ -52,7 +52,7 @@ static inline int32_t fastfloor(float fp)
  * Permutation table. This is just a random jumble of all numbers 0-255.
  *
  * This produce a repeatable pattern of 256, but Ken Perlin stated
- * that it is not a problem for graphic texture as the noise features disappear
+ * that it is not a problem for graphic Texture as the noise features disappear
  * at a distance far enough to be able to see a repeatable pattern of 256.
  *
  * This needs to be exactly the same for all instances on all platforms,

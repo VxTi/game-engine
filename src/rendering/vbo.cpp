@@ -2,15 +2,15 @@
 // Created by Luca Warmenhoven on 15/05/2024.
 //
 
-#include "VBO.h"
+#include "vbo.h"
 
-VBO::VBO() : Drawable(glm::vec3(0), glm::vec3(1), glm::vec3(0))
+VBO::VBO()
 {
     glGenBuffers(1, &this->vboBufferId);
     glGenBuffers(1, &this->eboBufferId);
 }
 
-VBO::VBO(unsigned int renderingMode) : Drawable(glm::vec3(0), glm::vec3(1), glm::vec3(0))
+VBO::VBO(unsigned int renderingMode)
 {
     glGenBuffers(1, &this->vboBufferId);
     glGenBuffers(1, &this->eboBufferId);

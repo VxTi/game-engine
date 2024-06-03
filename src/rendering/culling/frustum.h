@@ -5,7 +5,7 @@
 #ifndef GRAPHICS_TEST_FRUSTUM_H
 #define GRAPHICS_TEST_FRUSTUM_H
 
-#include "../Transformation.h"
+#include "../../math/transformation.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 

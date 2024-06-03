@@ -7,11 +7,13 @@
 
 #include <thread>
 #include <queue>
-#include "../rendering/Rendering.h"
-#include "entity/Entity.h"
-#include "entity/Player.h"
-#include "../rendering/culling/Frustum.h"
+#include "../rendering/renderer.h"
+#include "entity/entity.h"
+#include "entity/player.h"
+#include "../rendering/culling/frustum.h"
+#include "../rendering/vbo.h"
 
+#define CHUNK_RENDER_DISTANCE (20)
 #define CHUNK_DRAW_DISTANCE (15)
 #define CHUNK_SIZE (64)
 #define CHUNK_BASE_WATER_LEVEL (10.0f)
@@ -64,9 +66,32 @@ private:
      */
     std::queue<immature_chunk_data_t *> *chunkMeshGenerationQueue;
 
+    /**
+     * The location where the last chunk generation was performed.
+     * This is used to determine when the chunk generation thread should
+     * continue generating chunks depending on the distance of the player to this point.
+     */
+    glm::vec3 lastGenerationPoint;
+
+public:
+
+    static glm::vec3 sunPosition;
+    static glm::vec4 sunColor;
+    static float sunIntensity;
+    static float sunAmbient;
+    static float sunSize;
+
+    static float fogDensity;
+
+    static glm::vec4 fogColor;
+    static glm::vec3 fogFactors;
+    static glm::vec4 skyBottomColor;
+    static glm::vec4 skyTopColor;
+
+
 public:
     std::unordered_map<std::size_t, chunk_t *> *chunkMap;
-    std::vector<Updatable *> *worldObjects;
+    std::vector<Entity *> *worldObjects;
     std::vector<Drawable *> *drawables;
 
     /**
@@ -77,16 +102,16 @@ public:
      * CHUNK_GENERATION_OCTAVES[1] - The height multiplier
      */
     static constexpr float CHUNK_GENERATION_OCTAVES[][2] = {
-            { 200, 30 },
-            { 4,   5 },
-            { 4,   .1 },
-            { 1,   .005 }
+            { 500, 30 },
+            { 100,   1 },
+            /*{ 4,   .1 },*/
+            /*{ 1,   .005 }*/
     };
     /**
      * The biome height scaling factors.
      * These factors are used to scale the height of the terrain based on the biome.
      */
-    static constexpr float BIOME_HEIGHT_SCALING_FACTORS[CHUNK_BIOME_COUNT] = { 0.5f, 0.7f, 1.0f, 1.2f, 2.0f };
+    static constexpr float BIOME_HEIGHT_SCALING_FACTORS[CHUNK_BIOME_COUNT] = { 0.5f, 0.7f, 1.0f, 1.2f, 1.3f };
 
     /**
      * Destructor
@@ -108,9 +133,9 @@ public:
     void generateChunk(int32_t x, int32_t z);
 
     /**
-     * Function for generating the mesh for a chunk.
+     * Function for generating the Mesh for a chunk.
      *
-     * @param chunk The chunk to startWorldGeneration the mesh for.
+     * @param chunk The chunk to startWorldGeneration the Mesh for.
      */
     void generateChunkMesh(chunk_t *chunk, vbo_data_t *vbo_data) const;
 };

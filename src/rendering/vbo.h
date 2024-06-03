@@ -5,7 +5,7 @@
 #ifndef GRAPHICS_TEST_VBO_H
 #define GRAPHICS_TEST_VBO_H
 
-#include "Rendering.h"
+#include "renderer.h"
 
 /**
  * A struct representing a vertex.
@@ -18,7 +18,7 @@ typedef struct
 } vertex_t;
 
 /**
- * Struct containing all mesh_data for a VBO mesh.
+ * Struct containing all mesh_data for a VBO Mesh.
  */
 typedef struct {
     unsigned int indices_count;
@@ -31,7 +31,7 @@ typedef struct {
 /**
  * A vertex_t Buffer Object.
  */
-class VBO : public Drawable
+class VBO
 {
 
 private:
@@ -122,14 +122,7 @@ public:
     /**
      * Render the VBO onto the screen.
      */
-    void draw(float deltaTime) override;
-
-    /**
-     * Function that checks whether the object is within the provided frustum.
-     * @param frustum The frustum to check against
-     */
-    /*bool isWithinFrustum(Frustum frustum) override;*/
-
+    void draw(float deltaTime);
 };
 
 #endif //GRAPHICS_TEST_VBO_H

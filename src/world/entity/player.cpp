@@ -2,8 +2,9 @@
 // Created by Luca Warmenhoven on 19/05/2024.
 //
 
-#include "Player.h"
+#include "player.h"
 #include "glm/ext/matrix_transform.hpp"
+#include <iostream>
 
 void Player::update(float deltaTime)
 {

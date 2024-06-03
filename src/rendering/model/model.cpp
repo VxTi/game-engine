@@ -2,7 +2,7 @@
 // Created by Luca Warmenhoven on 21/05/2024.
 //
 
-#include "Model.h"
+#include "model.h"
 
 #include <fstream>
 #include <regex.h>
@@ -64,7 +64,7 @@ Model *Model::loadObj(const char *filePath)
         } else if ( !strcmp(segment, "f")) {
             subsegment = strtok(segment, "/");
 
-            // Handle texture coordinates
+            // Handle Texture coordinates
         } else if ( !strcmp(segment, "vt")) {
             vectors.emplace_back(glm::vec3(
                     atof(strtok(nullptr, segment_separator)),

@@ -1,14 +1,30 @@
 //
 // Created by Luca Warmenhoven on 20/05/2024.
 //
-#include "World.h"
-#include "SimplexNoise.h"
-#include "../rendering/model/Mesh.h"
+#include "world.h"
+#include "noise.h"
 #include <iostream>
 #include <random>
 
+/** Global variables */
+glm::vec3 World::sunPosition = glm::normalize(glm::vec3(0.0f, 1.0f, 2.0f));
+glm::vec4 World::sunColor = glm::vec4(1.0f, 1.0f, .8f, 1.0f);
 
-void world_generation_fn(World *world, Transformation *observationPoint)
+float World::sunIntensity = 1.0f;
+float World::sunSize = 0.14f;
+float World::sunAmbient = 0.1f;
+
+float World::fogDensity = 0.0005f;
+
+glm::vec4 World::fogColor = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
+glm::vec3 World::fogFactors = glm::vec3(0.1f, 0.5f, 0.5f);
+
+glm::vec4 World::skyBottomColor = glm::vec4(1);
+glm::vec4 World::skyTopColor = glm::vec4(.23, .64, .97, 1.0);
+
+
+
+void worldGenerationFn(World *world, Transformation *observationPoint, glm::vec3 *lastObservationPoint)
 {
 
     if ( observationPoint == nullptr ) {
@@ -19,23 +35,29 @@ void world_generation_fn(World *world, Transformation *observationPoint)
     // Generate chunkMap around the observation point in a circular manner
     int32_t x, z, px, pz;
     // Wait until the thread is stopped
-    std::chrono::nanoseconds interval(100);
+    std::chrono::nanoseconds interval(10);
 
     while ( true ) {
-        if ( world->chunkMap->size() > 5000 )
-            return;
-        px = (((int32_t) observationPoint->position.x ) / (int) (CHUNK_COORDINATE_SCALAR)) *
-                CHUNK_SIZE;
-        pz = (((int32_t) observationPoint->position.z ) / (int) (CHUNK_COORDINATE_SCALAR)) *
-             CHUNK_SIZE;
+        if (
+                pow(lastObservationPoint->x - observationPoint->position.x , 2)
+              + pow(lastObservationPoint->z - observationPoint->position.z, 2) >=
+                pow(CHUNK_COORDINATE_SCALAR, 2)) {
+            *lastObservationPoint = observationPoint->position;
+            /*if ( world->chunkMap->size() > 5000 )
+                return;*/
+            px = (((int32_t) observationPoint->position.x ) / (int) (CHUNK_COORDINATE_SCALAR)) *
+                 CHUNK_SIZE;
+            pz = (((int32_t) observationPoint->position.z ) / (int) (CHUNK_COORDINATE_SCALAR)) *
+                 CHUNK_SIZE;
 
-        for ( x = -CHUNK_DRAW_DISTANCE; x < CHUNK_DRAW_DISTANCE; x++ ) {
-            for ( z = -CHUNK_DRAW_DISTANCE; z < CHUNK_DRAW_DISTANCE; z++ ) {
-                std::this_thread::sleep_for(interval);
-                world->generateChunk(
-                        px + x * CHUNK_SIZE,
-                        pz + z * CHUNK_SIZE
-                );
+            for ( x = -CHUNK_DRAW_DISTANCE; x < CHUNK_DRAW_DISTANCE; x++ ) {
+                for ( z = -CHUNK_DRAW_DISTANCE; z < CHUNK_DRAW_DISTANCE; z++ ) {
+                    std::this_thread::sleep_for(interval);
+                    world->generateChunk(
+                            px + x * CHUNK_SIZE,
+                            pz + z * CHUNK_SIZE
+                    );
+                }
             }
         }
     }
@@ -43,6 +65,8 @@ void world_generation_fn(World *world, Transformation *observationPoint)
 
 /*
  * Start the world generation thread.
+ * This method is called from the main thread and will startWorldGeneration
+ * the world generation thread.
  */
 void World::startWorldGeneration(Transformation *observationPoint)
 {
@@ -51,12 +75,13 @@ void World::startWorldGeneration(Transformation *observationPoint)
     if ( this->worldGenerationThread )
         return;
 
+    World::lastGenerationPoint = observationPoint->position + vec3(10000, 0, 0);
 
     drawables = new std::vector<Drawable *>();
-    worldObjects = new std::vector<Updatable *>();
+    worldObjects = new std::vector<Entity *>();
     chunkMap = new std::unordered_map<std::size_t, chunk_t *>();
     chunkMeshGenerationQueue = new std::queue<immature_chunk_data_t *>();
-    worldGenerationThread = new std::thread(world_generation_fn, this, observationPoint);
+    worldGenerationThread = new std::thread(worldGenerationFn, this, observationPoint, &lastGenerationPoint);
 }
 
 inline bool shouldRenderChunk(chunk_t &chunk, Frustum *frustum)
@@ -64,7 +89,7 @@ inline bool shouldRenderChunk(chunk_t &chunk, Frustum *frustum)
     //return frustum->isWithin(vec3(chunk.x + offset, 0, chunk.z + offset), offset * 2);
 
     return frustum->isWithin(vec3(chunk.x, 0, chunk.z),
-                             CHUNK_SIZE * CHUNK_COORDINATE_SCALING_FACTOR);
+                             CHUNK_SIZE * CHUNK_COORDINATE_SCALING_FACTOR * 2);
 }
 
 /**
@@ -80,7 +105,6 @@ void World::render(float deltaTime, Frustum *frustum)
         chunkPair.second->mesh->draw(deltaTime);
         chunksRendered++;
     }
-    std::cout << "Chunks rendered: " << chunksRendered << " / " << chunkMap->size() << std::endl;
     for ( Drawable *drawable: *drawables ) {
         drawable->draw(0);
     }
@@ -146,8 +170,8 @@ static vec3 getNormalVector(float x, float z)
 }
 
 /*
- * Generate the mesh for a chunk.
- * This function will startWorldGeneration a mesh with the provided vertices and indices.
+ * Generate the Mesh for a chunk.
+ * This function will startWorldGeneration a Mesh with the provided vertices and indices.
  */
 void World::generateChunkMesh(chunk_t *chunk, vbo_data_t *vbo_data) const
 {
@@ -166,15 +190,15 @@ void World::generateChunkMesh(chunk_t *chunk, vbo_data_t *vbo_data) const
 
 void World::update(float deltaTime) const
 {
-    for ( Updatable *updatable: *worldObjects ) {
-        updatable->update(deltaTime);
+    for ( Entity *entities: *worldObjects ) {
+        entities->update(deltaTime);
     }
 }
 
 /*
  * Generate a chunk at the given coordinates.
- * This function will startWorldGeneration both the height-map coordinates for the chunk, and the mesh mesh_data.
- * This mesh mesh_data can then be fed into the GPU for rendering.
+ * This function will startWorldGeneration both the height-map coordinates for the chunk, and the Mesh mesh_data.
+ * This Mesh mesh_data can then be fed into the GPU for rendering.
  */
 void World::generateChunk(int32_t x, int32_t z)
 {
@@ -193,7 +217,7 @@ void World::generateChunk(int32_t x, int32_t z)
 
     float cx, cy, cz;
 
-    // Memory for mesh
+    // Memory for Mesh
     int mesh_width = CHUNK_SIZE + 1;
     const int indices_count = CHUNK_SIZE * CHUNK_SIZE * 6;
 
@@ -227,7 +251,7 @@ void World::generateChunk(int32_t x, int32_t z)
                     normal.x, normal.y, normal.z
             };
 
-            // Generate indices for the mesh
+            // Generate indices for the Mesh
             if ( i < CHUNK_SIZE && j < CHUNK_SIZE) {
 
                 data_points[ i * CHUNK_SIZE + j ] = cy;
@@ -255,7 +279,7 @@ void World::generateChunk(int32_t x, int32_t z)
     generated->z = z * CHUNK_COORDINATE_SCALING_FACTOR;
 
     // Store chunk_mesh_data in destination. The memory can be freed
-    // after the mesh has been generated.
+    // after the Mesh has been generated.
     auto *chunk_mesh_data = (immature_chunk_data_t *) malloc(sizeof(immature_chunk_data_t));
     chunk_mesh_data->mesh_data = (vbo_data_t *) malloc(sizeof(vbo_data_t));
     chunk_mesh_data->mesh_data->indices = indices;
@@ -264,7 +288,7 @@ void World::generateChunk(int32_t x, int32_t z)
     chunk_mesh_data->mesh_data->vertices_count = mesh_width * mesh_width;
     chunk_mesh_data->chunk = generated;
 
-    // Add to mesh generation queue
+    // Add to Mesh generation queue
     chunkMeshGenerationQueue->push(chunk_mesh_data);
 }
 

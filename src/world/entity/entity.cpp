@@ -2,11 +2,13 @@
 // Created by Luca Warmenhoven on 19/05/2024.
 //
 
-#include "Entity.h"
+#include "entity.h"
 
 Entity::Entity(glm::vec3 position, glm::vec3 velocity, glm::vec3 acceleration, glm::vec3 rotation, float mass,
-               float frictionConstant) : Drawable(position, vec3(1), rotation)
+               float frictionConstant)
 {
+    this->position = position;
+    this->rotation = rotation;
     this->velocity = velocity;
     this->acceleration = acceleration;
     this->mass = mass;

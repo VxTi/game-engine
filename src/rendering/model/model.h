@@ -6,7 +6,7 @@
 #define GRAPHICS_TEST_MODEL_H
 
 #include "glm/vec3.hpp"
-#include "../VBO.h"
+#include "../vbo.h"
 
 typedef struct
 {

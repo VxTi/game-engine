@@ -2,7 +2,7 @@
 // Created by Luca Warmenhoven on 21/05/2024.
 //
 
-#include "Frustum.h"
+#include "frustum.h"
 
 void Frustum::updateViewProjectionMatrix(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 {
@@ -76,9 +76,9 @@ float Frustum::distanceToPlane(Plane *plane, glm::vec3 point)
     return glm::dot(plane->normal, point) + plane->distance;
 }
 
-bool Frustum::isWithin(glm::vec3 referencePosition)
+bool Frustum::isWithin(glm::vec3 referencePoint)
 {
-    return true; // IMPLEMENT !!
+    return this->isWithin(referencePoint, 0);
 }
 
 bool Frustum::isWithin(glm::vec3 referencePoint, float radius)

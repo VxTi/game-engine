@@ -6,10 +6,9 @@
 #define GRAPHICS_TEST_ENTITY_H
 
 #include <glm/glm.hpp>
-#include "../../rendering/Rendering.h"
-#include "../WorldObject.h"
+#include "../../rendering/renderer.h"
 
-class Entity : public Updatable, public Drawable
+class Entity : public Transformation
 {
 public:
     glm::vec3 velocity;
@@ -35,12 +34,12 @@ public:
      */
     Entity();
 
-    /**
+    virtual /**
      * Update the entity
      *
      * @param deltaTime The time since the last update
      */
-    void update(float deltaTime) override;
+    void update(float deltaTime);
 
     /**
      * Apply a force to the entity
@@ -52,7 +51,7 @@ public:
     /**
      * Method for rendering this entity in the world.
      */
-    void draw(float deltaTime) override;
+    void draw(float deltaTime);
 
 };
 

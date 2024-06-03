@@ -125,6 +125,8 @@ void main()
         resultingPosition.y = y;
     }
 
+    ioNormal = normalize(ioNormal);
+
     gl_Position = u_ModelViewProjectionMatrix * vec4(resultingPosition, 1.0);
     ioPosition = position;
 }

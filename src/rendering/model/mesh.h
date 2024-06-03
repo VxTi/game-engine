@@ -6,13 +6,13 @@
 #define GRAPHICS_TEST_MESH_H
 
 
-#include "../Rendering.h"
-#include "../VBO.h"
+#include "../renderer.h"
+#include "../vbo.h"
 
 /**
- * Represents a mesh that can be drawn.
+ * Represents a Mesh that can be drawn.
  */
-class Mesh : public Drawable
+class Mesh
 {
 private:
     VBO *buffer;
@@ -33,10 +33,10 @@ public:
     ~Mesh();
 
     /**
-     * Draws the mesh.
+     * Draws the Mesh.
      * @param deltaTime The time passed since the last frame in seconds.
      */
-    void draw(float deltaTime) override;
+    void draw(float deltaTime);
 
 };
 

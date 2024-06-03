@@ -13,22 +13,39 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 link_directories(${PROJECT_SOURCE_DIR}/libraries)
 
-add_executable(graphics_test src/main.cpp src/rendering/VBO.cpp src/rendering/Shader.cpp src/io/Files.cpp src/io/Files.h src/rendering/Renderer.cpp src/rendering/Rendering.h src/world/entity/Entity.cpp src/world/entity/Entity.h src/world/entity/Player.cpp src/world/SimplexNoise.cpp src/world/SimplexNoise.h src/world/WorldObject.cpp src/world/WorldObject.h src/rendering/font/DrawableFont.h src/rendering/font/TrueType.cpp src/world/entity/Player.h src/world/World.h src/world/World.cpp
-        src/rendering/culling/Frustum.cpp
-        src/rendering/model/Model.cpp
-        src/rendering/model/Model.h
-        src/rendering/VBO.h
-        src/rendering/Texture.cpp
-        src/rendering/Texture.h
+add_executable(graphics_test src/main.cpp
+        src/rendering/vbo.cpp
+        src/rendering/shader.cpp
+        src/io/Files.cpp src/io/Files.h
+        src/rendering/renderer.cpp
+        src/rendering/renderer.h
+        src/world/entity/entity.cpp
+        src/world/entity/entity.h
+        src/world/entity/player.cpp
+        src/world/noise.cpp
+        src/world/noise.h
+        src/rendering/font/DrawableFont.h
+        src/rendering/font/TrueType.cpp
+        src/world/entity/player.h
+        src/world/world.h
+        src/world/world.cpp
+        src/rendering/culling/frustum.cpp
+        src/rendering/model/model.cpp
+        src/rendering/model/model.h
+        src/rendering/vbo.h
+        src/rendering/texture.cpp
+        src/rendering/texture.h
         include/stb/stb_image.h
-        src/rendering/Shader.h
-        src/rendering/model/Mesh.cpp
-        src/rendering/model/Mesh.h
+        src/rendering/shader.h
+        src/rendering/model/mesh.cpp
+        src/rendering/model/mesh.h
         src/math/OcTree.cpp
         src/math/OcTree.h
-        include/octree/octree.h
-        src/rendering/culling/Frustum.h
-        src/rendering/Transformation.h
+        src/rendering/culling/frustum.h
+        src/math/transformation.h
+        include/stb/stb_image.h
+        src/rendering/culling/culling.h
+        src/rendering/culling/occlusion.hpp
 )
 
 target_link_libraries(graphics_test ${PROJECT_SOURCE_DIR}/libraries/libglfw3.a)
