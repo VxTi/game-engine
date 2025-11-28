@@ -170,8 +170,8 @@ static vec3 getNormalVector(float x, float z) {
  */
 void World::generateChunkMesh(chunk_t *chunk, vbo_data_t *vbo_data) const {
   VBO *mesh = new VBO();
-  mesh->withVertices(vbo_data->vertices, vbo_data->vertices_count);
-  mesh->withIndices(vbo_data->indices, vbo_data->indices_count);
+  mesh->addVertices(vbo_data->vertices, vbo_data->vertices_count);
+  mesh->addIndices(vbo_data->indices, vbo_data->indices_count);
   mesh->build();
   chunk->mesh = mesh;
   // Add chunk to world

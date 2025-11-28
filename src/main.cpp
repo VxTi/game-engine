@@ -219,7 +219,7 @@ void sendStandardShaderUniforms(Shader &shader) {
 void assembleSkyboxMesh() {
   skybox = new VBO();
 
-  skybox->withVertices(
+  skybox->addVertices(
       (vertex_t[8]){
           {-1, -1, -1, .5, .5, .5}, // - - -
           {1, -1, -1, -.5, .5, .5}, // + - -
@@ -232,7 +232,7 @@ void assembleSkyboxMesh() {
           {-1, 1, 1, .5, -.5, -.5},
       },
       8);
-  skybox->withIndices(
+  skybox->addIndices(
       (unsigned int[36]){
           0, 3, 1, 1, 3, 2, // Bottom
           4, 5, 6, 6, 7, 4, // Top
