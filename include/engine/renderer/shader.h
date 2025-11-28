@@ -8,6 +8,8 @@
 #include <OpenGL/gl3.h>
 #include <glm/glm.hpp>
 
+#define SHADER_LOG_BUFFER_SIZE (512)
+
 typedef enum {
   VERTEX = GL_VERTEX_SHADER,
   FRAGMENT = GL_FRAGMENT_SHADER

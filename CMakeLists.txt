@@ -62,7 +62,10 @@ foreach(src ${PROJECT_SOURCES})
     endif()
 endforeach()
 
+
+# Adds the PROJECT_ROOT macro to the compiler definitions
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+target_compile_definitions(${PROJECT_NAME} PRIVATE PROJECT_ROOT="${CMAKE_SOURCE_DIR}")
 
 # -----------------------
 # Include paths

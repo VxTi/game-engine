@@ -4,6 +4,7 @@
 
 #include <engine/io/files.h>
 #include <engine/renderer/shader.h>
+#include <filesystem>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
@@ -21,7 +22,7 @@ ShaderCompileResult Shader::addFragmentShader(const char *path) {
   return this->loadSource(this->fragmentShaderId, path);
 }
 
-ShaderCompileResult Shader::addVertexShader(const char *path) {
+ShaderCompileResult Shader::addVertexShader(const char *relativePath) {
   this->vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
 
   if (!this->vertexShaderId) {
@@ -29,15 +30,19 @@ ShaderCompileResult Shader::addVertexShader(const char *path) {
     return FAILURE;
   }
 
-  return this->loadSource(this->vertexShaderId, path);
+  return this->loadSource(this->vertexShaderId, relativePath);
 }
 
 ShaderCompileResult Shader::loadSource(GLuint shaderId,
-                                       const char *sourcePath) {
-  std::string source = Files::read(sourcePath);
+                                       const char *relativePath) {
+
+  std::filesystem::path projectRoot = PROJECT_ROOT;
+  std::filesystem::path absolutePath = projectRoot / "shaders" / relativePath;
+
+  std::string source = Files::read(relativePath);
 
   if (source.empty()) {
-    std::cerr << "Shader Error - Failed to read source file: " << sourcePath
+    std::cerr << "Shader Error - Failed to read source file: " << relativePath
               << std::endl;
     return FAILURE;
   }
@@ -48,8 +53,8 @@ ShaderCompileResult Shader::loadSource(GLuint shaderId,
   GLint status;
   glGetShaderiv(shaderId, GL_COMPILE_STATUS, &status);
   if (!status) {
-    GLchar errorLog[512];
-    glGetShaderInfoLog(shaderId, 512, NULL, errorLog);
+    GLchar errorLog[SHADER_LOG_BUFFER_SIZE];
+    glGetShaderInfoLog(shaderId, SHADER_LOG_BUFFER_SIZE, NULL, errorLog);
     std::cerr << "Shader Error - Compilation failed: " << errorLog << std::endl;
     return FAILURE;
   }
@@ -64,11 +69,11 @@ ShaderCompileResult Shader::compile() {
 
   GLint linkStatus;
   GLint validateStatus;
-  GLchar buffer[512];
+  GLchar buffer[SHADER_LOG_BUFFER_SIZE];
   glGetProgramiv(this->programId, GL_LINK_STATUS, &linkStatus);
 
   if (!linkStatus) {
-    glGetProgramInfoLog(this->programId, 512, NULL, buffer);
+    glGetProgramInfoLog(this->programId, SHADER_LOG_BUFFER_SIZE, NULL, buffer);
     std::cerr << "Shader Error - Linking failed: " << buffer << std::endl;
     return FAILURE;
   }
@@ -77,7 +82,7 @@ ShaderCompileResult Shader::compile() {
   glGetProgramiv(this->programId, GL_VALIDATE_STATUS, &validateStatus);
 
   if (!validateStatus) {
-    glGetProgramInfoLog(this->programId, 512, NULL, buffer);
+    glGetProgramInfoLog(this->programId, SHADER_LOG_BUFFER_SIZE, NULL, buffer);
     std::cerr << "Shader Error - Validation failed: " << buffer << std::endl;
     return FAILURE;
   }
