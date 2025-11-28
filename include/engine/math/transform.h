@@ -2,12 +2,12 @@
 // Created by Luca Warmenhoven on 31/05/2024.
 //
 
-#ifndef GRAPHICS_TEST_TRANSFORMATION_H
-#define GRAPHICS_TEST_TRANSFORMATION_H
+#ifndef GAME_ENGINE_TRANSFORMATION_H
+#define GAME_ENGINE_TRANSFORMATION_H
 
 #include <glm/vec3.hpp>
 
-class Transformation {
+class Transform {
 public:
   glm::vec3 position;
 
@@ -21,4 +21,4 @@ public:
   };
 };
 
-#endif // GRAPHICS_TEST_TRANSFORMATION_H
+#endif // GAME_ENGINE_TRANSFORMATION_H

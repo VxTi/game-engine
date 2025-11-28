@@ -5,7 +5,7 @@
 #ifndef GRAPHICS_TEST_FRUSTUM_H
 #define GRAPHICS_TEST_FRUSTUM_H
 
-#include "../../math/transformation.h"
+#include <engine/math/transform.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -31,7 +31,7 @@ private:
 
 public:
 
-    Transformation *source;
+    Transform *source;
 
     /**
      * Constructor for creating a new Frustum
@@ -41,7 +41,7 @@ public:
      * @param viewMatrix The view matrix of the frustum
      * @param projectionMatrix The projection matrix of the frustum
      */
-    Frustum(Transformation *source, glm::mat4 viewMatrix, glm::mat4 projectionMatrix);
+    Frustum(Transform *source, glm::mat4 viewMatrix, glm::mat4 projectionMatrix);
 
 
     /**

@@ -9,10 +9,10 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <engine/math/transformation.h>
+#include <engine/renderer/culling/frustum.h>
+#include <engine/math/transform.h>
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
-#include <vector>
 
 using namespace glm;
 
@@ -27,7 +27,7 @@ using namespace glm;
  * Class representing a drawable object.
  * The draw method must be overridden when extending this class.
  */
-class Drawable : public Transformation
+class Drawable : public Transform
 {
 public:
     Drawable(vec3 position, vec3 scale, vec3 rotation);
@@ -42,7 +42,6 @@ public:
     /* TODO: Implement */ /*virtual bool isWithinFrustum(Frustum frustum);*/
 };
 
-#include "culling/frustum.h"
 
 typedef struct {
     glm::mat4 modelMatrix;

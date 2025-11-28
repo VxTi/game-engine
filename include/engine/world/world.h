@@ -7,11 +7,11 @@
 
 #include <thread>
 #include <queue>
-#include "../rendering/renderer.h"
-#include "entity/entity.h"
-#include "entity/player.h"
-#include "../rendering/culling/frustum.h"
-#include "../rendering/vbo.h"
+#include <engine/renderer/renderer.h>
+#include <engine/world/entity/player.h>
+#include <engine/world/entity/entity.h>
+#include <engine/renderer/culling/frustum.h>
+#include <engine/renderer/vbo.h>
 
 #define CHUNK_RENDER_DISTANCE (20)
 #define CHUNK_DRAW_DISTANCE (15)
@@ -118,7 +118,7 @@ public:
      */
     ~World();
 
-    void startWorldGeneration(Transformation *observationPoint);
+    void startWorldGeneration(Transform *observationPoint);
 
     void render(float deltaTime, Frustum *frustum);
 
