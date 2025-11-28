@@ -2,12 +2,12 @@
 // Created by Luca Warmenhoven on 24/05/2024.
 //
 
-#include "texture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "../include/stb/stb_image.h"
-#include "renderer.h"
+#include <engine/renderer/texture.h>
+#include <engine/renderer/renderer.h>
+#include <stb_image.h>
 
 Texture Texture::loadFromResource(const char *resourceRelativePath)
 {

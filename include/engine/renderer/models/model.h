@@ -5,8 +5,7 @@
 #ifndef GRAPHICS_TEST_MODEL_H
 #define GRAPHICS_TEST_MODEL_H
 
-#include "glm/vec3.hpp"
-#include "../vbo.h"
+#include <engine/renderer/vbo.h>
 
 typedef struct
 {
@@ -20,7 +19,7 @@ typedef struct
  * Class representing a model composed of faces.
  * This object can be moved, rotated and scaled.
  */
-class Model : public Transformation
+class Model : public Transform
 {
 public:
     Face *faces;

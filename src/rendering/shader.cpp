@@ -5,10 +5,13 @@
 #include <engine/io/files.h>
 #include <engine/renderer/shader.h>
 #include <filesystem>
+#include <fstream>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
 using namespace glm;
+
+Shader::Shader() {}
 
 ShaderCompileResult Shader::addFragmentShader(const char *path) {
   this->fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
@@ -39,10 +42,18 @@ ShaderCompileResult Shader::loadSource(GLuint shaderId,
   std::filesystem::path projectRoot = PROJECT_ROOT;
   std::filesystem::path absolutePath = projectRoot / "shaders" / relativePath;
 
-  std::string source = Files::read(relativePath);
+  std::ifstream file(absolutePath, std::ios::in | std::ios::binary);
+  if (!file) {
+    std::cerr << "Shader Error - Failed to read source file: " << absolutePath
+              << std::endl;
+    return FAILURE;
+  }
+
+  auto source = std::string((std::istreambuf_iterator<char>(file)),
+                            std::istreambuf_iterator<char>());
 
   if (source.empty()) {
-    std::cerr << "Shader Error - Failed to read source file: " << relativePath
+    std::cerr << "Shader Error - Source file is empty: " << absolutePath
               << std::endl;
     return FAILURE;
   }

@@ -2,9 +2,7 @@
 // Created by Luca Warmenhoven on 24/05/2024.
 //
 
-#include "mesh.h"
-
-#include <iostream>
+#include <engine/renderer/models/mesh.h>
 
 Mesh::Mesh(VBO *buffer, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
