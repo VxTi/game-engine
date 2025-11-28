@@ -142,13 +142,13 @@ void Scene::resetMatrices() {
   this->currentMatrix.position = glm::vec3(0.0f);
 }
 
-Scene::Scene(Transform observer) : observer(std::move(observer)) {
+Scene::Scene(Transform observer)
+    : observer(std::move(observer)),
+      frustum(Frustum(glm::mat4(1.0f), glm::mat4(1.0f))) {
   this->currentMatrix = {
       glm::mat4(1.0f), glm::mat4(1.0f), glm::mat4(1.0f), glm::mat4(1.0f),
       glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f),
   };
-
-  this->frustum = Frustum(&observer, glm::mat4(1.0f), glm::mat4(1.0f));
 
   this->skyboxShader = Shader();
   skyboxShader.addFragmentShader("skybox_frag.glsl");
@@ -166,6 +166,23 @@ Scene::Scene(Transform observer) : observer(std::move(observer)) {
   skyboxVbo.build();
 }
 
+void applyUniforms(Shader &shader, World &world, Window &window,
+                   Transform &observer, double timePassed) {
+  shader.uniformFloat("u_time", timePassed);
+  shader.uniformFloat("u_SunIntensity", world.sunIntensity);
+  shader.uniformFloat("u_SunAmbient", world.sunAmbient);
+  shader.uniformVec3("u_SunPosition", world.sunPosition);
+  shader.uniformVec4("u_SunColor", world.sunColor);
+  shader.uniformFloat("u_FogDensity", world.fogDensity);
+  shader.uniformFloat("u_SunSize", world.sunSize);
+  shader.uniformVec2("u_Resolution", (float)window.width, (float)window.height);
+  shader.uniformVec3("u_CameraPosition", observer.position.x,
+                     observer.position.y, observer.position.z);
+}
+
+/**
+ * Function that draws the scene.
+ */
 void Scene::draw(Window &window, World &world) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -181,14 +198,8 @@ void Scene::draw(Window &window, World &world) {
   Scene::updateFrustum(&this->frustum);
 
   // Send the uniforms to the shader
-  skyboxShader.uniformVec2("u_Resolution", (float)window.width,
-                           (float)window.height);
-  skyboxShader.uniformFloat("u_SunSize", World::sunSize);
-  skyboxShader.uniformFloat("u_SunIntensity", World::sunIntensity);
-  skyboxShader.uniformFloat("u_SunAmbient", World::sunAmbient);
-  skyboxShader.uniformVec3("u_SunPosition", World::sunPosition);
-  skyboxShader.uniformVec4("u_SunColor", World::sunColor);
-  skyboxShader.uniformFloat("u_FogDensity", World::fogDensity);
+
+  applyUniforms(skyboxShader, world, window, observer, timePassed);
 
   Scene::pushMatrices(skyboxShader.getProgramId());
   this->skyboxVbo.draw(deltaTime);
@@ -204,18 +215,7 @@ void Scene::draw(Window &window, World &world) {
                          (float)window.height);
   Scene::pushMatrices(this->sceneShader.getProgramId());
 
-  // Provide camera position to shader
-  this->sceneShader.uniformVec3("u_SunPosition", sunPosition.x, sunPosition.y,
-                                sunPosition.z);
-  this->sceneShader.uniformVec3("u_CameraPosition", observer.position.x,
-                                observer.position.y, observer.position.z);
-  this->sceneShader.uniformFloat("u_time", timePassed);
-
-  this->sceneShader.uniformFloat("u_SunIntensity", World::sunIntensity);
-  this->sceneShader.uniformFloat("u_SunAmbient", World::sunAmbient);
-  this->sceneShader.uniformVec3("u_SunPosition", World::sunPosition);
-  this->sceneShader.uniformVec4("u_SunColor", World::sunColor);
-  this->sceneShader.uniformFloat("u_FogDensity", World::fogDensity);
+  applyUniforms(sceneShader, world, window, observer, timePassed);
 
   world.render(deltaTime, &this->frustum);
   world.update(deltaTime);

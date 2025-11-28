@@ -9,9 +9,6 @@ void Frustum::updateViewProjectionMatrix(glm::mat4 viewMatrix,
   glm::mat4 VP = projectionMatrix * viewMatrix;
   this->viewProjectionMatrix = VP;
 
-  if (!this->planes)
-    this->planes = (Plane *)malloc(FRUSTUM_PLANES * sizeof(Plane));
-
   // Extract the planes from the VP matrix
   // Left
   this->planes[0].normal.x = VP[0][3] + VP[0][0];
@@ -57,10 +54,7 @@ void Frustum::updateViewProjectionMatrix(glm::mat4 viewMatrix,
   }
 }
 
-Frustum::Frustum(Transform *source, glm::mat4 viewMatrix,
-                 glm::mat4 projectionMatrix) {
-  this->source = source;
-  this->planes = (Plane *)malloc(FRUSTUM_PLANES * sizeof(Plane));
+Frustum::Frustum(glm::mat4 viewMatrix, glm::mat4 projectionMatrix) {
   this->updateViewProjectionMatrix(viewMatrix, projectionMatrix);
 }
 
@@ -74,20 +68,21 @@ float Frustum::distanceToPlane(Plane *plane, glm::vec3 point) {
   return glm::dot(plane->normal, point) + plane->distance;
 }
 
-bool Frustum::isWithin(glm::vec3 referencePoint) {
-  return this->isWithin(referencePoint, 0);
+bool Frustum::isWithin(Transform &observer, glm::vec3 referencePoint) {
+  return this->isWithin(observer, referencePoint, 0);
 }
 
-bool Frustum::isWithin(glm::vec3 referencePoint, float radius) {
+bool Frustum::isWithin(Transform &observer, glm::vec3 referencePoint,
+                       float radius) {
   // Step 1: Transform provided point to relative space
   // Transform the point to be within the frustum plane
-  glm::vec3 relativePosition = referencePoint - this->source->position;
+  glm::vec3 relativePosition = referencePoint - observer.position;
 
   // Calculate rotation matrix
   glm::mat4 rotationMatrix = glm::rotate(
-      glm::mat4(1.0f), glm::radians(-this->source->yaw), glm::vec3(0, 1, 0));
-  rotationMatrix = glm::rotate(
-      rotationMatrix, glm::radians(-this->source->pitch), glm::vec3(1, 0, 0));
+      glm::mat4(1.0f), glm::radians(-observer.yaw), glm::vec3(0, 1, 0));
+  rotationMatrix = glm::rotate(rotationMatrix, glm::radians(-observer.pitch),
+                               glm::vec3(1, 0, 0));
 
   for (int i = 0; i < FRUSTUM_PLANES; i++) {
     float distance =

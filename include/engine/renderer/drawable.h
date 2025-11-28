@@ -1,4 +1,3 @@
-#include <glm/vec3.hpp>
 #include <engine/math/transform.h>
 
 using namespace glm;

@@ -1,3 +1,4 @@
+#include "GLFW/glfw3.h"
 #include <engine/renderer/culling/frustum.h>
 #include <engine/renderer/scene.h>
 #include <engine/renderer/shader.h>
@@ -15,6 +16,9 @@ const glm::vec2 scrollFactor = glm::vec2(1.f, 1.f);
 void keyCallback(GLFWwindow *window, int key, int scancode, int action,
                  int mods);
 
+/**
+ * Main function of the application.
+ */
 int main() {
   if (!glfwInit()) {
     std::cout << "Failed to initialize GLFW" << std::endl;
@@ -28,7 +32,7 @@ int main() {
   };
 
   auto observer = Player();
-  auto world = World(observer);
+  auto world = World();
 
   observer.frictionConstant = 10.0f;
   observer.position = vec3(10, 10, 10);
@@ -49,21 +53,20 @@ int main() {
     glfwTerminate();
     exit(1);
   }
+  glfwSetWindowUserPointer(window.glfwWindow, &window);
+  glfwSetFramebufferSizeCallback(window.glfwWindow, [](GLFWwindow *_windowPtr,
+                                                       int width, int height) {
+    glViewport(0, 0, width, height);
+    auto window = static_cast<Window *>(glfwGetWindowUserPointer(_windowPtr));
 
-  //
-  // Secondary phase - Set callbacks and initialize OpenGL context
-  //
-  glfwSetFramebufferSizeCallback(
-      window.glfwWindow,
-      [&window](GLFWwindow *_windowPtr, int width, int height) {
-        window.width = width;
-        window.height = height;
-        glViewport(0, 0, width, height);
-      });
+    if (window) {
+      window->width = width;
+      window->height = height;
+    }
+  });
 
-  glfwSetScrollCallback(window.glfwWindow, [&observer](GLFWwindow *_windowPtr,
-                                                       double xoffset,
-                                                       double yoffset) {
+  glfwSetScrollCallback(window.glfwWindow, [](GLFWwindow *_windowPtr,
+                                              double xoffset, double yoffset) {
     observer.pitch = fmod(observer.pitch - yoffset * scrollFactor.x, 360.0f);
     observer.yaw = fmod(observer.yaw + xoffset * scrollFactor.y, 360.0f);
     observer.pitch = glm::clamp(observer.pitch, -90.0f, 90.0f);
@@ -80,6 +83,7 @@ int main() {
   // Final phase - Initialize rendering related
   //
   world.startWorldGeneration(&observer);
+  world.worldObjects.push_back(&observer);
   auto scene = Scene(observer);
 
   std::chrono::duration lastTime =
@@ -99,7 +103,7 @@ int main() {
   glDepthFunc(GL_LEQUAL);
 
   while (!glfwWindowShouldClose(window.glfwWindow)) {
-    scene.draw();
+    scene.draw(window, world);
   }
   glfwDestroyWindow(window.glfwWindow);
   glfwTerminate();

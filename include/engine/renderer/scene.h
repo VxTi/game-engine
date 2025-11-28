@@ -71,7 +71,7 @@ public:
     return currentMatrix.modelViewProjectionMatrix;
   }
 
-  /**
+  /** 
    * Function that prepares all the matrices for further use.
    * These matrices can then be pushed to the provided shader by calling
    * `pushMatrices(programId)`.

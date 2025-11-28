@@ -5,22 +5,6 @@
 #include <engine/world/world.h>
 #include <iostream>
 
-/** Global variables */
-glm::vec3 World::sunPosition = glm::normalize(glm::vec3(0.0f, 1.0f, 2.0f));
-glm::vec4 World::sunColor = glm::vec4(1.0f, 1.0f, .8f, 1.0f);
-
-float World::sunIntensity = 1.0f;
-float World::sunSize = 0.14f;
-float World::sunAmbient = 0.1f;
-
-float World::fogDensity = 0.0005f;
-
-glm::vec4 World::fogColor = glm::vec4(0.5f, 0.5f, 0.5f, 1.0f);
-glm::vec3 World::fogFactors = glm::vec3(0.1f, 0.5f, 0.5f);
-
-glm::vec4 World::skyBottomColor = glm::vec4(1);
-glm::vec4 World::skyTopColor = glm::vec4(.23, .64, .97, 1.0);
-
 void worldGenerationFn(World *world, Transform *observationPoint,
                        glm::vec3 *lastObservationPoint) {
 
@@ -77,22 +61,20 @@ void World::startWorldGeneration(Transform *observationPoint) {
       worldGenerationFn, this, observationPoint, &lastGenerationPoint);
 }
 
-inline bool shouldRenderChunk(chunk_t &chunk, Frustum *frustum) {
-  // return frustum->isWithin(vec3(chunk.x + offset, 0, chunk.z + offset),
-  // offset * 2);
-
-  return frustum->isWithin(vec3(chunk.x, 0, chunk.z),
-                           CHUNK_SIZE * CHUNK_COORDINATE_SCALING_FACTOR * 2);
+inline bool shouldRenderChunk(chunk_t &chunk, Transform &observer,
+                              Frustum &frustum) {
+  return frustum.isWithin(observer, vec3(chunk.x, 0, chunk.z),
+                          CHUNK_SIZE * CHUNK_COORDINATE_SCALING_FACTOR * 2);
 }
 
 /**
  * Render the world.
  * This function will render all the chunkMap that are within the frustum.
  */
-void World::render(float deltaTime, Frustum *frustum) {
+void World::render(Frustum &frustum, Transform &observer, float deltaTime) {
   int chunksRendered = 0;
   for (auto chunkPair : chunkMap) {
-    if (!shouldRenderChunk(*chunkPair.second, frustum))
+    if (!shouldRenderChunk(*chunkPair.second, observer, frustum))
       continue;
     chunkPair.second->mesh->draw(deltaTime);
     chunksRendered++;
@@ -281,10 +263,15 @@ void World::generateChunk(int32_t x, int32_t z) {
   chunkMeshGenerationQueue->push(chunk_mesh_data);
 }
 
-World::World(Entity observer)
-    : observer(std::move(observer)), drawables(std::vector<Drawable *>()),
-      worldObjects(std::vector<Entity *>()) {
-  this->worldObjects.push_back(&observer);
+World::World()
+    : drawables(std::vector<Drawable *>()),
+      worldObjects(std::vector<Entity *>()),
+      sunPosition(glm::normalize(glm::vec3(0.0f, 1.0f, 2.0f))),
+      sunColor(glm::vec4(1.0f, 1.0f, .8f, 1.0f)), sunIntensity(1.0f),
+      sunSize(0.14f), sunAmbient(0.1f), fogDensity(0.0005f),
+      fogColor(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f)),
+      fogFactors(glm::vec3(0.1f, 0.5f, 0.5f)), skyBottomColor(glm::vec4(1)),
+      skyTopColor(glm::vec4(.23, .64, .97, 1.0)) {
   this->drawables = std::vector<Drawable *>();
   this->chunkMap = std::unordered_map<std::size_t, chunk_t *>();
   this->worldGenerationThread = nullptr;

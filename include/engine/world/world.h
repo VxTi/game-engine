@@ -77,27 +77,23 @@ private:
   glm::vec3 lastGenerationPoint;
 
 public:
-  static glm::vec3 sunPosition;
-  static glm::vec4 sunColor;
-  static float sunIntensity;
-  static float sunAmbient;
-  static float sunSize;
+  float sunIntensity;
+  float sunAmbient;
+  float sunSize;
+  float fogDensity;
 
-  static float fogDensity;
-
-  static glm::vec4 fogColor;
-  static glm::vec3 fogFactors;
-  static glm::vec4 skyBottomColor;
-  static glm::vec4 skyTopColor;
-
-  // Thy who observes the world
-  Entity observer;
+  glm::vec3 sunPosition;
+  glm::vec4 sunColor;
+  glm::vec4 fogColor;
+  glm::vec3 fogFactors;
+  glm::vec4 skyBottomColor;
+  glm::vec4 skyTopColor;
 
   std::unordered_map<std::size_t, chunk_t *> chunkMap = {};
   std::vector<Entity *> worldObjects = {};
   std::vector<Drawable *> drawables = {};
 
-  World(Entity observer);
+  World();
   /**
    * Chunk generation octaves.
    * These octaves are a set of two numbers, the first one indicating the
@@ -122,7 +118,7 @@ public:
 
   void startWorldGeneration(Transform *observationPoint);
 
-  void render(float deltaTime, Frustum *frustum);
+  void render(Frustum &frustum, Transform &observer, float deltaTime);
 
   void update(float deltaTime) const;
 

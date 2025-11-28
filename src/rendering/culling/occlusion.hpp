@@ -5,20 +5,16 @@
 #ifndef GRAPHICS_TEST_OCCLUSION_HPP
 #define GRAPHICS_TEST_OCCLUSION_HPP
 
-
-#include <engine/renderer/renderer.h>
 #include <engine/renderer/culling/frustum.h>
+#include <engine/renderer/scene.h>
 
-namespace culling::occlusion
-{
-    extern bool isOccluded(Drawable* drawable, Frustum frustum)
-    {
-        if ( !frustum.isWithin(drawable->position) )
-        {
-            return true;
-        }
-    }
+namespace culling::occlusion {
+extern bool isOccluded(Drawable *drawable, Frustum frustum) {
+  if (!frustum.isWithin(drawable->position)) {
+    return true;
+  }
+  return false;
 }
+} // namespace culling::occlusion
 
-
-#endif //GRAPHICS_TEST_OCCLUSION_HPP
+#endif // GRAPHICS_TEST_OCCLUSION_HPP
