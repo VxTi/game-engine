@@ -1,15 +1,10 @@
 #include <iostream>
 #include "rendering/renderer.h"
 #include "rendering/vbo.h"
-#include "io/Files.h"
 #include "rendering/shader.h"
 #include "world/entity/player.h"
-#include "world/noise.h"
 #include "world/world.h"
 #include "rendering/culling/frustum.h"
-
-#include <filesystem>
-
 
 using namespace std::chrono;
 
@@ -91,12 +86,12 @@ int main()
     std::cout << std::filesystem::current_path().relative_path() << std::endl;
 
     skyboxShader = new Shader(
-            "/Users/lucawarm/Jetbrains/CLion/graphics-test/shaders/skybox_frag.glsl",
-            "/Users/lucawarm/Jetbrains/CLion/graphics-test/shaders/skybox_vert.glsl"
+            "/Users/luca/Projects/Personal/game-engine/shaders/skybox_frag.glsl",
+            "/Users/luca/Projects/Personal/game-engine/shaders/skybox_vert.glsl"
             );
     worldShader = new Shader(
-            "/Users/lucawarm/Jetbrains/CLion/graphics-test/shaders/world_rendering_frag.glsl",
-            "/Users/lucawarm/Jetbrains/CLion/graphics-test/shaders/world_rendering_vert.glsl"
+            "/Users/luca/Projects/Personal/game-engine/shaders/world_rendering_frag.glsl",
+            "/Users/luca/Projects/Personal/game-engine/shaders/world_rendering_vert.glsl"
             );
 
     world->startWorldGeneration(&player);

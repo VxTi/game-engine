@@ -1,1 +1,6 @@
-/include/
+.DS_Store
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+_deps/*
+Makefile

@@ -1,51 +1,78 @@
-cmake_minimum_required(VERSION 3.3)
-
-project(graphics_test)
-
+cmake_minimum_required(VERSION 3.16)
+project(GameEngine)
 set(CMAKE_CXX_STANDARD 20)
 
-if (APPLE)
-    set(CMAKE_CXX_FLAGS "-framework Cocoa -framework IOKit -framework OpenGL -framework CoreVideo")
-    add_compile_definitions(GL_SILENCE_DEPRECATION)
-endif ()
+include(FetchContent)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
+# -----------------------
+# Fetch GLM
+# -----------------------
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG 1.0.2
+)
+FetchContent_MakeAvailable(glm)
 
-link_directories(${PROJECT_SOURCE_DIR}/libraries)
+# -----------------------
+# Fetch stb
+# -----------------------
+FetchContent_Declare(
+    stb
+    GIT_REPOSITORY https://github.com/nothings/stb.git
+)
+FetchContent_MakeAvailable(stb)
 
-add_executable(graphics_test src/main.cpp
-        src/rendering/vbo.cpp
-        src/rendering/shader.cpp
-        src/io/Files.cpp src/io/Files.h
-        src/rendering/renderer.cpp
-        src/rendering/renderer.h
-        src/world/entity/entity.cpp
-        src/world/entity/entity.h
-        src/world/entity/player.cpp
-        src/world/noise.cpp
-        src/world/noise.h
-        src/rendering/font/DrawableFont.h
-        src/rendering/font/TrueType.cpp
-        src/world/entity/player.h
-        src/world/world.h
-        src/world/world.cpp
-        src/rendering/culling/frustum.cpp
-        src/rendering/model/model.cpp
-        src/rendering/model/model.h
-        src/rendering/vbo.h
-        src/rendering/texture.cpp
-        src/rendering/texture.h
-        include/stb/stb_image.h
-        src/rendering/shader.h
-        src/rendering/model/mesh.cpp
-        src/rendering/model/mesh.h
-        src/math/OcTree.cpp
-        src/math/OcTree.h
-        src/rendering/culling/frustum.h
-        src/math/transformation.h
-        include/stb/stb_image.h
-        src/rendering/culling/culling.h
-        src/rendering/culling/occlusion.hpp
+# stb doesn't have targets, so manually add include directory:
+# stb_SOURCE_DIR gets defined by FetchContent
+set(STB_INCLUDE_DIR ${stb_SOURCE_DIR})
+
+# -----------------------
+# Fetch GLFW
+# -----------------------
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG latest
+)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(glfw)
+
+# -----------------------
+# Collect sources
+# -----------------------
+file(GLOB_RECURSE PROJECT_SOURCES
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp"
 )
 
-target_link_libraries(graphics_test ${PROJECT_SOURCE_DIR}/libraries/libglfw3.a)
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+
+# -----------------------
+# Include paths
+# -----------------------
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${STB_INCLUDE_DIR}
+)
+
+# glm and glfw provide CMake targets already
+target_link_libraries(${PROJECT_NAME} PRIVATE glm glfw)
+
+# -----------------------
+# macOS frameworks
+# -----------------------
+if (APPLE)
+   target_link_libraries(${PROJECT_NAME} PRIVATE
+       "-framework Cocoa"
+       "-framework IOKit"
+       "-framework OpenGL"
+       "-framework CoreVideo"
+   )
+   target_compile_definitions(${PROJECT_NAME} PRIVATE GL_SILENCE_DEPRECATION)
+endif()
