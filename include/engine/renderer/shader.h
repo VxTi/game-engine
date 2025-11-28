@@ -13,41 +13,42 @@ typedef enum {
   FRAGMENT = GL_FRAGMENT_SHADER
 } ShaderType;
 
+typedef enum {
+  SUCCESS = 1,
+  FAILURE = 0,
+} ShaderCompileResult;
+
 class Shader {
 
 private:
-  // Paths to the sources of both fragment and vertex files
-  char *vertexSourcePath;
-  char *fragmentSourcePath;
-
   GLuint programId;
   GLuint fragmentShaderId;
   GLuint vertexShaderId;
 
 private:
-  void loadSource(GLuint shaderId, const char *sourcePath);
+  ShaderCompileResult loadSource(GLuint shaderId, const char *sourcePath);
 
 public:
   /**
-   * Constructor for creating a shader with
-   * @param fragmentSourcePath
-   * @param vertexSourcePath
+   * Generic constructor
    */
-  Shader(char *fragmentSourcePath, char *vertexSourcePath);
   Shader();
 
-  // Destructor
-  ~Shader();
-
-  /**
-   * Sets the source of the shader program.
-   */
-  void setSourcePath(char *sourcePath, ShaderType shaderType);
+  ShaderCompileResult addFragmentShader(const char *path);
+  ShaderCompileResult addVertexShader(const char *path);
 
   /**
    * Compiles the shader.
    */
-  void compile();
+  ShaderCompileResult compile();
+
+  /**
+   * Static method for creating a shader from a single source file.
+   */
+  static Shader *fromSource(const char *path);
+
+  // Destructor
+  ~Shader();
 
   /**
    * Binds the shader to the current OpenGL context.

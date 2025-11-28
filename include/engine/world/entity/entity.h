@@ -9,14 +9,16 @@
 #include <engine/renderer/renderer.h>
 #include <glm/glm.hpp>
 
+using namespace glm;
+
 class Entity : public Transform {
 public:
-  glm::vec3 velocity;
-  glm::vec3 acceleration;
-  glm::vec3 position;
+  vec3 velocity;
+  vec3 acceleration;
+  vec3 position;
 
   union {
-    glm::vec3 rotation;
+    vec3 rotation;
     struct {
       float pitch;
       float yaw;
@@ -37,8 +39,8 @@ public:
    * @param mass The mass of the entity
    * @param frictionConstant The friction constant of the entity
    */
-  Entity(glm::vec3 position, glm::vec3 velocity, glm::vec3 acceleration,
-         glm::vec3 rotation, float mass, float frictionConstant);
+  Entity(vec3 position, vec3 velocity, vec3 acceleration, vec3 rotation,
+         float mass, float frictionConstant);
 
   /**
    * Default constructor for creating a new entity
@@ -57,7 +59,7 @@ public:
    *
    * @param force The force to apply, given in Newtons
    */
-  void applyForce(glm::vec3 force, float deltaTime);
+  void applyForce(vec3 force, float deltaTime);
 
   /**
    * Method for rendering this entity in the world.
