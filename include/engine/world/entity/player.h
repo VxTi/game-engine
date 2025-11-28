@@ -5,7 +5,7 @@
 #ifndef GRAPHICS_TEST_PLAYER_H
 #define GRAPHICS_TEST_PLAYER_H
 
-#include "entity.h"
+#include <engine/world/entity/entity.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 

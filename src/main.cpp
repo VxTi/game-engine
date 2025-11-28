@@ -1,9 +1,8 @@
 #include <iostream>
-#include "rendering/renderer.h"
-#include "rendering/vbo.h"
-#include "rendering/shader.h"
-#include "world/entity/player.h"
-#include "world/world.h"
+#include <engine/renderer/renderer.h>
+#include <engine/renderer/shader.h>
+#include <engine/world/entity/player.h>
+#include <engine/world/world.h>
 #include "rendering/culling/frustum.h"
 
 using namespace std::chrono;

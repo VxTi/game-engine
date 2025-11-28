@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(GameEngine)
+
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(FetchContent)
 
@@ -23,8 +25,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(stb)
 
-# stb doesn't have targets, so manually add include directory:
-# stb_SOURCE_DIR gets defined by FetchContent
+# stb has no CMake target, so expose its include folder manually
 set(STB_INCLUDE_DIR ${stb_SOURCE_DIR})
 
 # -----------------------
@@ -57,11 +58,11 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 # Include paths
 # -----------------------
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${STB_INCLUDE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include     # enables #include <engine/...>
+    ${STB_INCLUDE_DIR}                      # stb headers
 )
 
-# glm and glfw provide CMake targets already
+# glm and glfw provide CMake targets
 target_link_libraries(${PROJECT_NAME} PRIVATE glm glfw)
 
 # -----------------------

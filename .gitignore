@@ -4,3 +4,5 @@ CMakeFiles
 cmake_install.cmake
 _deps/*
 Makefile
+.cache
+build
