@@ -5,10 +5,11 @@
 #ifndef GRAPHICS_TEST_ENTITY_H
 #define GRAPHICS_TEST_ENTITY_H
 
+#include <engine/math/transform.h>
 #include <engine/renderer/renderer.h>
 #include <glm/glm.hpp>
 
-class Entity {
+class Entity : public Transform {
 public:
   glm::vec3 velocity;
   glm::vec3 acceleration;

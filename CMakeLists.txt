@@ -52,6 +52,16 @@ file(GLOB_RECURSE PROJECT_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp"
 )
 
+list(REMOVE_DUPLICATES PROJECT_SOURCES)
+
+# Exclude build/_deps directory from sources 3
+foreach(src ${PROJECT_SOURCES})
+    string(FIND "${src}" "/build/" found)
+    if (NOT found EQUAL -1)
+        list(REMOVE_ITEM PROJECT_SOURCES "${src}")
+    endif()
+endforeach()
+
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
 # -----------------------

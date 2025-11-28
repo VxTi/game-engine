@@ -6,109 +6,103 @@
 #define GRAPHICS_TEST_SHADER_H
 
 #include <OpenGL/gl3.h>
-#include <string>
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
-typedef enum
-{
-    VERTEX = GL_VERTEX_SHADER,
-    FRAGMENT = GL_FRAGMENT_SHADER
+typedef enum {
+  VERTEX = GL_VERTEX_SHADER,
+  FRAGMENT = GL_FRAGMENT_SHADER
 } ShaderType;
 
-class Shader
-{
+class Shader {
 
 private:
+  // Paths to the sources of both fragment and vertex files
+  char *vertexSourcePath;
+  char *fragmentSourcePath;
 
-    // Paths to the sources of both fragment and vertex files
-    char *vertexSourcePath;
-    char *fragmentSourcePath;
-
-    GLuint programId;
-    GLuint fragmentShaderId;
-    GLuint vertexShaderId;
+  GLuint programId;
+  GLuint fragmentShaderId;
+  GLuint vertexShaderId;
 
 private:
-    void loadSource(GLuint shaderId, const char *sourcePath);
+  void loadSource(GLuint shaderId, const char *sourcePath);
 
 public:
+  /**
+   * Constructor for creating a shader with
+   * @param fragmentSourcePath
+   * @param vertexSourcePath
+   */
+  Shader(char *fragmentSourcePath, char *vertexSourcePath);
+  Shader();
 
-    /**
-     * Constructor for creating a shader with
-     * @param fragmentSourcePath
-     * @param vertexSourcePath
-     */
-    Shader(char *fragmentSourcePath, char *vertexSourcePath);
-    Shader();
+  // Destructor
+  ~Shader();
 
-    // Destructor
-    ~Shader();
+  /**
+   * Sets the source of the shader program.
+   */
+  void setSourcePath(char *sourcePath, ShaderType shaderType);
 
-    /**
-     * Sets the source of the shader program.
-     */
-    void setSourcePath(char *sourcePath, ShaderType shaderType);
+  /**
+   * Compiles the shader.
+   */
+  void compile();
 
-    /**
-     * Compiles the shader.
-     */
-    void compile();
+  /**
+   * Binds the shader to the current OpenGL context.
+   */
+  void bind();
 
-    /**
-     * Binds the shader to the current OpenGL context.
-     */
-    void bind();
+  /**
+   * Unbinds the shader from the current OpenGL context.
+   */
+  void unbind();
 
-    /**
-     * Unbinds the shader from the current OpenGL context.
-     */
-    void unbind();
+  /**
+   * Sends a floating point value to the shader
+   */
+  void uniformFloat(const char *name, float value) const;
 
-    /**
-     * Sends a floating point value to the shader
-     */
-    void uniformFloat(const char *name, float value) const;
+  /**
+   * Sends an array of floating point numbers to the shader
+   */
+  void uniformNFloat(const char *name, int count, float *value) const;
 
-    /**
-     * Sends an array of floating point numbers to the shader
-     */
-    void uniformNFloat(const char *name, int count, float *value) const;
+  /**
+   * Sends a vec2 (2 floating point values) to the shader
+   */
+  void uniformVec2(const char *name, float x, float y) const;
+  void uniformVec2(const char *name, glm::vec2 vector) const;
 
-    /**
-     * Sends a vec2 (2 floating point values) to the shader
-     */
-    void uniformVec2(const char *name, float x, float y) const;
-    void uniformVec2(const char *name, glm::vec2 vector) const;
+  /**
+   * Sends a vec3 (3 floating point values) to the shader
+   */
+  void uniformVec3(const char *name, float x, float y, float z) const;
+  void uniformVec3(const char *name, glm::vec3 vector) const;
 
-    /**
-     * Sends a vec3 (3 floating point values) to the shader
-     */
-    void uniformVec3(const char *name, float x, float y, float z) const;
-    void uniformVec3(const char *name, glm::vec3 vector) const;
+  /**
+   * Sends a vec4 (4 floating point values) to the shader
+   */
+  void uniformVec4(const char *name, float x, float y, float z, float w) const;
+  void uniformVec4(const char *name, glm::vec4 vector) const;
 
-    /**
-     * Sends a vec4 (4 floating point values) to the shader
-     */
-    void uniformVec4(const char *name, float x, float y, float z, float w) const;
-    void uniformVec4(const char *name, glm::vec4 vector) const;
+  /**
+   * Sends a mat4 (4x4 matrix) to the shader
+   */
+  void uniformMat4(const char *name, float *value) const;
+  void uniformMat4(const char *name, glm::mat4 matrix) const;
 
-    /**
-     * Sends a mat4 (4x4 matrix) to the shader
-     */
-    void uniformMat4(const char *name, float *value) const;
-    void uniformMat4(const char *name, glm::mat4 matrix) const;
+  /**
+   * Sends a texture to the shader.
+   */
+  void uniformTexture(const char *name, GLuint textureId);
 
-    /**
-     * Sends a texture to the shader.
-     */
-    void uniformTexture(const char *name, GLuint textureId);
-
-    /**
-     * Get the program ID of the shader.
-     * @return The program ID.
-     */
-    GLuint getProgramId() const;
-
+  /**
+   * Get the program ID of the shader.
+   * @return The program ID.
+   */
+  GLuint getProgramId() const;
 };
 
-#endif //GRAPHICS_TEST_SHADER_H
+#endif // GRAPHICS_TEST_SHADER_H

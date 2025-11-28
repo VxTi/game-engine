@@ -6,8 +6,8 @@
 #define GRAPHICS_TEST_OCCLUSION_HPP
 
 
-#include "../renderer.h"
-#include "frustum.h"
+#include <engine/renderer/renderer.h>
+#include <engine/renderer/culling/frustum.h>
 
 namespace culling::occlusion
 {

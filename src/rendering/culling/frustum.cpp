@@ -2,7 +2,7 @@
 // Created by Luca Warmenhoven on 21/05/2024.
 //
 
-#include "frustum.h"
+#include <engine/renderer/culling/frustum.h>
 
 void Frustum::updateViewProjectionMatrix(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 {
@@ -57,7 +57,7 @@ void Frustum::updateViewProjectionMatrix(glm::mat4 viewMatrix, glm::mat4 project
     }
 }
 
-Frustum::Frustum(Transformation *source, glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
+Frustum::Frustum(Transform *source, glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 {
     this->source = source;
     this->planes = (Plane *) malloc(FRUSTUM_PLANES * sizeof(Plane));
