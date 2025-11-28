@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 4.2.0)
 project(GameEngine)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -7,7 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(FetchContent)
 
 # -----------------------
-# Fetch GLM
+# glm (OpenGL Mathematics)
 # -----------------------
 FetchContent_Declare(
     glm
@@ -17,7 +17,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glm)
 
 # -----------------------
-# Fetch stb
+# stb_image
 # -----------------------
 FetchContent_Declare(
     stb
@@ -29,7 +29,7 @@ FetchContent_MakeAvailable(stb)
 set(STB_INCLUDE_DIR ${stb_SOURCE_DIR})
 
 # -----------------------
-# Fetch GLFW
+# GLFW (Graphics Library Framework)
 # -----------------------
 FetchContent_Declare(
     glfw
@@ -65,7 +65,11 @@ endforeach()
 
 # Adds the PROJECT_ROOT macro to the compiler definitions
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
-target_compile_definitions(${PROJECT_NAME} PRIVATE PROJECT_ROOT="${CMAKE_SOURCE_DIR}")
+target_compile_definitions(
+    ${PROJECT_NAME} 
+    PRIVATE
+    PROJECT_ROOT="${CMAKE_SOURCE_DIR}"
+)
 
 # -----------------------
 # Include paths
@@ -82,11 +86,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glm glfw)
 # macOS frameworks
 # -----------------------
 if (APPLE)
-   target_link_libraries(${PROJECT_NAME} PRIVATE
+    target_link_libraries(${PROJECT_NAME} PRIVATE
        "-framework Cocoa"
        "-framework IOKit"
        "-framework OpenGL"
        "-framework CoreVideo"
    )
-   target_compile_definitions(${PROJECT_NAME} PRIVATE GL_SILENCE_DEPRECATION)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE GL_SILENCE_DEPRECATION)
 endif()

@@ -13,9 +13,9 @@
 },
 {
   "directory": "/Users/luca/Projects/Personal/game-engine",
-  "command": "/usr/bin/c++ -DGL_SILENCE_DEPRECATION -DPROJECT_ROOT=\\\"/Users/luca/Projects/Personal/game-engine\\\" -I/Users/luca/Projects/Personal/game-engine/include -I/Users/luca/Projects/Personal/game-engine/_deps/stb-src -I/Users/luca/Projects/Personal/game-engine/_deps/glm-src -I/Users/luca/Projects/Personal/game-engine/_deps/glfw-src/include -std=gnu++20 -arch arm64 -o CMakeFiles/GameEngine.dir/src/math/OcTree.cpp.o -c /Users/luca/Projects/Personal/game-engine/src/math/OcTree.cpp",
-  "file": "/Users/luca/Projects/Personal/game-engine/src/math/OcTree.cpp",
-  "output": "CMakeFiles/GameEngine.dir/src/math/OcTree.cpp.o"
+  "command": "/usr/bin/c++ -DGL_SILENCE_DEPRECATION -DPROJECT_ROOT=\\\"/Users/luca/Projects/Personal/game-engine\\\" -I/Users/luca/Projects/Personal/game-engine/include -I/Users/luca/Projects/Personal/game-engine/_deps/stb-src -I/Users/luca/Projects/Personal/game-engine/_deps/glm-src -I/Users/luca/Projects/Personal/game-engine/_deps/glfw-src/include -std=gnu++20 -arch arm64 -o CMakeFiles/GameEngine.dir/src/math/octree.cpp.o -c /Users/luca/Projects/Personal/game-engine/src/math/octree.cpp",
+  "file": "/Users/luca/Projects/Personal/game-engine/src/math/octree.cpp",
+  "output": "CMakeFiles/GameEngine.dir/src/math/octree.cpp.o"
 },
 {
   "directory": "/Users/luca/Projects/Personal/game-engine",

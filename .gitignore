@@ -7,3 +7,6 @@ Makefile
 .cache
 build
 compile_commands.json
+CPackConfig.cmake
+CPackSourceConfig.cmake
+bin
