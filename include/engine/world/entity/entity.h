@@ -6,7 +6,6 @@
 #define GRAPHICS_TEST_ENTITY_H
 
 #include <engine/math/transform.h>
-#include <engine/renderer/renderer.h>
 #include <glm/glm.hpp>
 
 using namespace glm;
@@ -16,15 +15,6 @@ public:
   vec3 velocity;
   vec3 acceleration;
   vec3 position;
-
-  union {
-    vec3 rotation;
-    struct {
-      float pitch;
-      float yaw;
-      float roll;
-    };
-  };
 
   float mass;
   float frictionConstant;

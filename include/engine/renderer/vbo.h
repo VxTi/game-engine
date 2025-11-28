@@ -5,8 +5,9 @@
 #ifndef GRAPHICS_TEST_VBO_H
 #define GRAPHICS_TEST_VBO_H
 
-#include <engine/renderer/renderer.h>
+#include <OpenGL/gltypes.h>
 #include <engine/util/result.h>
+#include <vector>
 
 /**
  * A struct representing a vertex.

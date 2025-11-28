@@ -20,7 +20,7 @@ typedef struct
 class Frustum {
 
 private:
-    Plane *planes;
+    Plane *plwanes;
 
     glm::mat4 viewProjectionMatrix;
 

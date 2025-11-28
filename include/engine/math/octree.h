@@ -9,7 +9,7 @@
 #define MAX_PARTITION_DEPTH (8)
 #define DEFAULT_PARTITION_DEPTH (4)
 
-template <typename T> class OcTreeElement {
+template <typename T> struct OcTreeElement {
   T value;
   double x;
   double y;
@@ -19,7 +19,7 @@ template <typename T> class OcTreeElement {
 template <typename T> class OcTreeNode {
 private:
   OcTreeNode<T> children[8];
-  std::vector<T> elements;
+  std::vector<OcTreeElement<T>> elements;
 
 public:
   bool isLeaf();
@@ -33,12 +33,12 @@ public:
 
 template <typename T> class OcTree : public OcTreeNode<T> {
 private:
-  /**
-   * Determines the max partitioning depth of this octree.
-   */
   const unsigned char partitionDepth;
 
   bool isWithinBounds(double x, double y, double z);
+
+  OcTreeNode<T> &traverseToLeaf(double x, double y, double z,
+                                bool createIfMissing);
 
 public:
   /**

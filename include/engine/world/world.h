@@ -6,7 +6,7 @@
 #define GRAPHICS_TEST_WORLD_H
 
 #include <engine/renderer/culling/frustum.h>
-#include <engine/renderer/renderer.h>
+#include <engine/renderer/drawable.h>
 #include <engine/renderer/vbo.h>
 #include <engine/world/entity/entity.h>
 #include <engine/world/entity/player.h>
@@ -43,6 +43,10 @@ typedef struct {
   chunk_t *chunk;
 } immature_chunk_data_t;
 
+/**
+ * The World class is responsible for managing the entire game world,
+ * including chunk generation, rendering, and updating.
+ */
 class World {
 
 private:
@@ -86,22 +90,25 @@ public:
   static glm::vec4 skyBottomColor;
   static glm::vec4 skyTopColor;
 
-public:
-  std::unordered_map<std::size_t, chunk_t *> *chunkMap;
-  std::vector<Entity *> *worldObjects;
-  std::vector<Drawable *> *drawables;
+  // Thy who observes the world
+  Entity observer;
 
+  std::unordered_map<std::size_t, chunk_t *> chunkMap = {};
+  std::vector<Entity *> worldObjects = {};
+  std::vector<Drawable *> drawables = {};
+
+  World(Entity observer);
   /**
    * Chunk generation octaves.
    * These octaves are a set of two numbers, the first one indicating the
    * coordinate dividing factor, the second one the height factor.
-   * CHUNK_GENERATION_OCTAVES[0] - The coordinate scaling factor for which to
-   * retrieve the noise for CHUNK_GENERATION_OCTAVES[1] - The height multiplier
+   * CHUNK_GENERATION_OCTAVES[0] - The coordinate scaling factor for which
+   * to retrieve the noise for CHUNK_GENERATION_OCTAVES[1] - The height
+   * multiplier
    */
   static constexpr float CHUNK_GENERATION_OCTAVES[][2] = {
-      {500, 30}, {100, 1},
-      /*{ 4,   .1 },*/
-      /*{ 1,   .005 }*/
+      {500, 30},
+      {100, 1},
   };
   /**
    * The biome height scaling factors.
@@ -111,9 +118,6 @@ public:
   static constexpr float BIOME_HEIGHT_SCALING_FACTORS[CHUNK_BIOME_COUNT] = {
       0.5f, 0.7f, 1.0f, 1.2f, 1.3f};
 
-  /**
-   * Destructor
-   */
   ~World();
 
   void startWorldGeneration(Transform *observationPoint);

@@ -72,9 +72,6 @@ void World::startWorldGeneration(Transform *observationPoint) {
 
   World::lastGenerationPoint = observationPoint->position + vec3(10000, 0, 0);
 
-  drawables = new std::vector<Drawable *>();
-  worldObjects = new std::vector<Entity *>();
-  chunkMap = new std::unordered_map<std::size_t, chunk_t *>();
   chunkMeshGenerationQueue = new std::queue<immature_chunk_data_t *>();
   worldGenerationThread = new std::thread(
       worldGenerationFn, this, observationPoint, &lastGenerationPoint);
@@ -94,13 +91,13 @@ inline bool shouldRenderChunk(chunk_t &chunk, Frustum *frustum) {
  */
 void World::render(float deltaTime, Frustum *frustum) {
   int chunksRendered = 0;
-  for (auto chunkPair : *chunkMap) {
+  for (auto chunkPair : chunkMap) {
     if (!shouldRenderChunk(*chunkPair.second, frustum))
       continue;
     chunkPair.second->mesh->draw(deltaTime);
     chunksRendered++;
   }
-  for (Drawable *drawable : *drawables) {
+  for (Drawable *drawable : drawables) {
     drawable->draw(0);
   }
 
@@ -175,7 +172,7 @@ void World::generateChunkMesh(chunk_t *chunk, vbo_data_t *vbo_data) const {
   mesh->build();
   chunk->mesh = mesh;
   // Add chunk to world
-  chunkMap->insert({chunk_hash(chunk->x, chunk->z), chunk});
+  chunkMap.insert({chunk_hash(chunk->x, chunk->z), chunk});
   // Free old memory, it's been copied video memory.
   free(vbo_data->indices);
   free(vbo_data->vertices);
@@ -183,7 +180,7 @@ void World::generateChunkMesh(chunk_t *chunk, vbo_data_t *vbo_data) const {
 }
 
 void World::update(float deltaTime) const {
-  for (Entity *entities : *worldObjects) {
+  for (Entity *entities : worldObjects) {
     entities->update(deltaTime);
   }
 }
@@ -198,7 +195,7 @@ void World::generateChunk(int32_t x, int32_t z) {
   worldGenerationMutex.lock();
 
   // Check if the chunk already exists
-  if (chunkMap->find(chunk_hash(x, z)) != chunkMap->end()) {
+  if (chunkMap.find(chunk_hash(x, z)) != chunkMap.end()) {
     worldGenerationMutex.unlock();
     return;
   }
@@ -284,6 +281,15 @@ void World::generateChunk(int32_t x, int32_t z) {
   chunkMeshGenerationQueue->push(chunk_mesh_data);
 }
 
+World::World(Entity observer)
+    : observer(std::move(observer)), drawables(std::vector<Drawable *>()),
+      worldObjects(std::vector<Entity *>()) {
+  this->worldObjects.push_back(&observer);
+  this->drawables = std::vector<Drawable *>();
+  this->chunkMap = std::unordered_map<std::size_t, chunk_t *>();
+  this->worldGenerationThread = nullptr;
+}
+
 World::~World() {
   // Delete content of queue
   immature_chunk_data_t *data;
@@ -299,20 +305,20 @@ World::~World() {
   }
 
   // Clear the chunk map
-  for (auto entry : *chunkMap) {
+  for (auto entry : chunkMap) {
     free(entry.second->height_map);
     delete entry.second->mesh;
     free(entry.second);
   }
 
-  drawables->clear();
-  worldObjects->clear();
-  chunkMap->clear();
+  for (auto drawable : this->drawables)
+    free(drawable);
+  drawables.clear();
+
+  worldObjects.clear();
+  chunkMap.clear();
   if (worldGenerationThread)
     worldGenerationThread->detach();
 
   delete worldGenerationThread;
-  delete drawables;
-  delete worldObjects;
-  delete chunkMap;
 }
